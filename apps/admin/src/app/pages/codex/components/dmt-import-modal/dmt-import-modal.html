@@ -1,0 +1,134 @@
+<!-- Import modal (non-review states) -->
+<ex-modal
+  [isOpen]="isOpen && importStatus() !== 'review'"
+  [closeOnBackdrop]="false"
+  width="480px"
+  (closed)="onClose()"
+>
+  <!-- Header -->
+  <div class="dmt-import-modal__header">
+    <span class="dmt-import-modal__title"
+      >{{ messages.IMPORT_MODAL_TITLE }}</span
+    >
+    <button
+      type="button"
+      class="dmt-import-modal__close"
+      (click)="onClose()"
+      aria-label="Close"
+    >
+      <ex-icon name="close_round" [size]="18"></ex-icon>
+    </button>
+  </div>
+  <!-- Body -->
+  <div class="dmt-import-modal__body">
+    @if (importSelectedFile()) { @if (importStatus() === 'fault') {
+    <!-- Fault state -->
+    <div class="dmt-import-modal__fault-view">
+      <ex-icon name="danger" [size]="56" color="#ff4d4f"></ex-icon>
+      <h3 class="dmt-import-modal__fault-title">
+        {{ messages.IMPORT_FAULT_HEADING }}
+      </h3>
+      <p class="dmt-import-modal__fault-desc">
+        {{ messages.IMPORT_FAULT_DESC }}
+      </p>
+      <ex-button variant="outline" size="small" (click)="onImportRetry()"
+        >{{ messages.IMPORT_SELECT_FILE }}</ex-button
+      >
+    </div>
+    } @else {
+    <!-- Processing state -->
+    <div class="dmt-import-modal__processing-banner">
+      <span class="dmt-import-modal__processing-dot"></span>
+      <span>{{ messages.IMPORT_PROCESSING_BANNER }}</span>
+    </div>
+    <div class="dmt-import-modal__file-entry">
+      <div class="dmt-import-modal__file-icon">
+        <ex-icon name="export" [size]="24" color="#034EA1"></ex-icon>
+      </div>
+      <div class="dmt-import-modal__file-info">
+        <p class="dmt-import-modal__file-type">
+          ไฟล์ ({{
+          importSelectedFile()!.name.slice(importSelectedFile()!.name.lastIndexOf('.'))
+          }})
+        </p>
+        <p class="dmt-import-modal__file-name">
+          {{ importSelectedFile()!.name }}
+        </p>
+      </div>
+      @if (!importIsLoading()) {
+      <ex-button variant="link" (click)="onImportChangeFile()"
+        >{{ messages.IMPORT_FILE_CHANGE }}</ex-button
+      >
+      }
+    </div>
+    @if (!importHandler) {
+    <div class="dmt-import-modal__processing-footer">
+      <ex-button variant="primary" width="100%" (click)="onImportSubmit()"
+        >{{ messages.IMPORT_SUBMIT }}</ex-button
+      >
+    </div>
+    } } } @else {
+    <!-- Upload state -->
+    @if (importHasError) {
+    <ex-form-alert variant="error" [title]="importErrorMessage"></ex-form-alert>
+    }
+    <div
+      class="dmt-import-modal__upload-area"
+      (dragover)="$event.preventDefault()"
+      (drop)="onImportDrop($event)"
+    >
+      <img src="images/Doc.png" alt="Document" width="64" height="64" />
+      <p class="dmt-import-modal__upload-title">
+        {{ messages.IMPORT_DRAG_TITLE }}
+      </p>
+      <p class="dmt-import-modal__upload-hint">
+        {{ messages.IMPORT_FORMAT_HINT }}
+      </p>
+      <p class="dmt-import-modal__upload-hint">
+        {{ messages.IMPORT_SIZE_HINT }}
+      </p>
+      <p class="dmt-import-modal__upload-or">{{ messages.IMPORT_OR }}</p>
+      <ex-button
+        variant="outline"
+        size="small"
+        class="dmt-import-modal__select-btn"
+        (click)="importFileInput.click()"
+        >{{ messages.IMPORT_SELECT_FILE }}</ex-button
+      >
+      <input
+        #importFileInput
+        type="file"
+        accept=".csv,.xlsx"
+        style="display: none"
+        (change)="onImportFileChange(importFileInput)"
+      />
+    </div>
+    }
+  </div>
+</ex-modal>
+
+<!-- Audit Masterdata Panel (review state) -->
+<app-audit-masterdata-panel
+  [isOpen]="isOpen && importStatus() === 'review'"
+  [rows]="reviewRows()"
+  (cancelClick)="onClose()"
+  (reimportClick)="onReviewReimport()"
+></app-audit-masterdata-panel>
+
+<!-- Import success toast -->
+@if (isSuccessToast()) {
+<div class="dmt__toast-wrap">
+  <ex-toast
+    variant="success"
+    [showCloseButton]="true"
+    [showConfirmButton]="false"
+    [autoDismiss]="true"
+    [autoDismissTime]="3000"
+    (dismiss)="onDismissSuccess()"
+  >
+    <p class="dmt__toast-message">
+      {{ messages.IMPORT_SUCCESS_TOAST }} ({{ insertedCount() }} ชุดข้อมูล)
+    </p>
+  </ex-toast>
+</div>
+}

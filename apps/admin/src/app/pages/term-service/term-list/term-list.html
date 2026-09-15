@@ -1,0 +1,337 @@
+﻿<div class="term-home" [attr.data-testid]="selectors.HOST">
+  <!-- Page Header -->
+  <div class="term-home__header">
+    <div class="term-home__header-info">
+      <h1 class="term-home__title">{{ messages.PAGE_TITLE }}</h1>
+      <p class="term-home__subtitle">{{ messages.PAGE_SUBTITLE }}</p>
+    </div>
+    <ex-button
+      variant="primary"
+      size="small"
+      icon="add"
+      [iconSize]="16"
+      [attr.data-testid]="selectors.BTN_CREATE"
+      (click)="navigateToCreate()"
+    >
+      {{ messages.BTN_CREATE }}
+    </ex-button>
+  </div>
+
+  <!-- Tabs -->
+  <ex-tabs
+    [pages]="tabPages"
+    [(selectedIndex)]="tabIndex"
+    (tabChange)="onTabChange($event)"
+    [testId]="selectors.TAB_USER"
+  ></ex-tabs>
+
+  <!-- Search and Filter -->
+  <div class="term-home__toolbar">
+    <ex-search-input
+      [placeholder]="messages.SEARCH_PLACEHOLDER"
+      [attr.data-testid]="selectors.SEARCH_INPUT"
+      (valueChange)="state.setSearch($event)"
+    ></ex-search-input>
+
+    <div class="term-home__filter-container">
+      <ex-button
+        variant="neutral"
+        size="small"
+        icon="filter"
+        [iconSize]="16"
+        [attr.data-testid]="selectors.BTN_FILTER"
+        (click)="state.toggleFilter()"
+      >
+        {{ messages.BTN_FILTER }}
+      </ex-button>
+
+      @if (state.filterOpen()) {
+      <div
+        class="term-home__filter-backdrop"
+        (click)="state.closeFilter()"
+        (keydown.enter)="state.closeFilter()"
+        (keydown.space)="state.closeFilter()"
+        tabindex="0"
+      ></div>
+      <div class="term-home__filter-panel">
+        <!-- Header -->
+        <div class="term-home__filter-header">
+          <span class="term-home__filter-title"
+            >{{ messages.FILTER_PANEL_TITLE }}</span
+          >
+          <ex-button variant="link" size="small" (click)="state.clearDraft()">
+            {{ messages.FILTER_CLEAR }}
+          </ex-button>
+        </div>
+
+        <!-- เธเธฃเธฐเน€เธ เธ— -->
+        <div class="term-home__filter-section">
+          <p class="term-home__filter-section-label">
+            {{ messages.FILTER_SECTION_TYPE }}
+          </p>
+          <ex-checkbox
+            [checked]="state.isDraftTypeChecked('mandatory')"
+            (checkedChange)="state.toggleDraftType('mandatory')"
+            >{{ messages.FILTER_TYPE_MANDATORY }}</ex-checkbox
+          >
+          <ex-checkbox
+            [checked]="state.isDraftTypeChecked('non-mandatory')"
+            (checkedChange)="state.toggleDraftType('non-mandatory')"
+            >{{ messages.FILTER_TYPE_NON_MANDATORY }}</ex-checkbox
+          >
+        </div>
+
+        <!-- เธชเธ–เธฒเธเธฐ -->
+        <div class="term-home__filter-section">
+          <p class="term-home__filter-section-label">
+            {{ messages.FILTER_SECTION_STATUS }}
+          </p>
+          <ex-checkbox
+            [checked]="state.isDraftStatusChecked('published')"
+            (checkedChange)="state.toggleDraftStatus('published')"
+            >{{ messages.FILTER_STATUS_ACCEPTED }}</ex-checkbox
+          >
+          <ex-checkbox
+            [checked]="state.isDraftStatusChecked('inactive')"
+            (checkedChange)="state.toggleDraftStatus('inactive')"
+            >{{ messages.FILTER_STATUS_NOT_ACCEPTED }}</ex-checkbox
+          >
+        </div>
+
+        <!-- Footer -->
+        <div class="term-home__filter-footer">
+          <ex-button
+            variant="outline"
+            size="small"
+            (click)="state.closeFilter()"
+          >
+            {{ messages.FILTER_BTN_CANCEL }}
+          </ex-button>
+          <ex-button
+            variant="primary"
+            size="small"
+            (click)="state.applyFilter()"
+          >
+            {{ messages.FILTER_BTN_APPLY }}
+          </ex-button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Filter label (result count shown by ex-table internally) -->
+  <div class="term-home__filter-bar">
+    <div class="term-home__active-filter-row">
+      <span class="term-home__filter-label">{{ messages.FILTER_BY }}</span>
+
+      @for (type of state.appliedTypes(); track type) {
+      <span class="term-home__active-filter-chip">
+        {{ messages.FILTER_SECTION_TYPE }}: {{ type === 'mandatory' ?
+        messages.FILTER_TYPE_MANDATORY : messages.FILTER_TYPE_NON_MANDATORY }}
+        <button
+          type="button"
+          class="term-home__active-filter-chip-close"
+          (click)="state.removeAppliedType(type)"
+          aria-label="Remove"
+        >
+          ×
+        </button>
+      </span>
+      } @for (status of state.appliedStatuses(); track status) {
+      <span class="term-home__active-filter-chip">
+        {{ messages.FILTER_SECTION_STATUS }}: {{ status === 'published' ?
+        messages.FILTER_STATUS_ACCEPTED : messages.FILTER_STATUS_NOT_ACCEPTED }}
+        <button
+          type="button"
+          class="term-home__active-filter-chip-close"
+          (click)="state.removeAppliedStatus(status)"
+          aria-label="Remove"
+        >
+          ×
+        </button>
+      </span>
+      }
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div #tableWrapper>
+    <ex-table
+      [data]="$any(tableRows())"
+      [total]="state.totalCount()"
+      [loading]="state.isLoading()"
+      [showCustomPagination]="false"
+      nzTableLayout="auto"
+      [scrollAfterRows]="12"
+      [pageIndex]="state.page()"
+      [attr.data-testid]="selectors.TABLE"
+      (columnSortChange)="onColumnSort($event)"
+    >
+      <ex-column
+        key="code"
+        [title]="messages.COL_CODE"
+        width="180px"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--code"
+          ></span>
+          } @else {
+          <span>{{ value }}</span>
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column
+        key="name"
+        [title]="messages.COL_TERM"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--name"
+          ></span>
+          } @else {
+          <span
+            class="term-home__cell-ellipsis"
+            [nzTooltipTitle]="value"
+            nz-tooltip
+            >{{ value }}</span
+          >
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column
+        key="service"
+        [title]="messages.COL_SERVICE"
+        width="140px"
+        align="center"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--service"
+          ></span>
+          } @else {
+          <span class="term-home__service-badge">{{ value }}</span>
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column
+        key="latestVersion"
+        [title]="messages.COL_LATEST_VERSION"
+        width="140px"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--version"
+          ></span>
+          } @else {
+          <span>{{ value }}</span>
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column
+        key="lastUpdated"
+        [title]="messages.COL_LAST_UPDATED"
+        width="210px"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--updated"
+          ></span>
+          } @else {
+          <span>{{ value }}</span>
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column
+        key="type"
+        [title]="messages.COL_TYPE"
+        width="130px"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--type"
+          ></span>
+          } @else if (value === 'mandatory') {
+          <ex-tag variant="info" iconRight="lock"
+            >{{ messages.TYPE_MANDATORY }}</ex-tag
+          >
+          } @else {
+          <ex-tag variant="default-light"
+            >{{ messages.TYPE_NON_MANDATORY }}</ex-tag
+          >
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column
+        key="status"
+        [title]="messages.COL_STATUS"
+        width="110px"
+        [sort]="{ show: true, fn: true }"
+      >
+        <ng-template exCell let-value let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--status"
+          ></span>
+          } @else if (value === 'published') {
+          <span
+            class="term-home__status-badge term-home__status-badge--published"
+          >
+            <span class="term-home__status-dot"></span>
+            {{ messages.STATUS_PUBLISHED }}
+          </span>
+          } @else {
+          <span
+            class="term-home__status-badge term-home__status-badge--inactive"
+          >
+            <span class="term-home__status-dot"></span>
+            {{ messages.STATUS_INACTIVE }}
+          </span>
+          }
+        </ng-template>
+      </ex-column>
+      <ex-column key="code" title="" align="right" width="44px">
+        <ng-template exCell let-row="row">
+          @if (isSkeletonRow(row)) {
+          <span
+            class="term-home__cell-skeleton term-home__cell-skeleton--action"
+          ></span>
+          } @else {
+          <ex-icon-button
+            name="chevron-right"
+            [attr.data-testid]="selectors.ROW"
+            (clicked)="onRowClick($any(row)['code'])"
+          ></ex-icon-button>
+          }
+        </ng-template>
+      </ex-column>
+    </ex-table>
+  </div>
+
+  @if (state.showToast()) {
+  <div class="term-home__toast-wrap">
+    <ex-toast
+      [variant]="state.toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="state.dismissToast()"
+      >{{ state.toastMessage() }}</ex-toast
+    >
+  </div>
+  }
+</div>

@@ -1,0 +1,35 @@
+<div
+  class="noti-item"
+  [class.noti-item--unread]="!item().isRead"
+  (click)="onClick()"
+  (keydown.enter)="onClick()"
+  tabindex="0"
+  role="button"
+>
+  <!-- Status icon -->
+  <div class="noti-item__icon" [style.background-color]="iconConfig().bgColor">
+    @if (item().iconType === 'error') {
+    <div class="noti-item__icon-inner">
+      <ex-icon name="close_round" color="#B91C1C" [size]="14"></ex-icon>
+    </div>
+    } @else {
+    <ex-icon
+      [name]="iconConfig().name"
+      [color]="iconConfig().color"
+      [size]="20"
+    ></ex-icon>
+    }
+  </div>
+
+  <!-- Content -->
+  <div class="noti-item__content">
+    <div class="noti-item__title">{{ item().title }}</div>
+    <div class="noti-item__subtitle">{{ item().subtitle }}</div>
+    <div class="noti-item__time">{{ timeLabel() }}</div>
+  </div>
+
+  <!-- Unread dot -->
+  @if (!item().isRead) {
+  <span class="noti-item__dot"></span>
+  }
+</div>

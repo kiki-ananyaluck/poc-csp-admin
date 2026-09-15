@@ -1,0 +1,175 @@
+<div class="step-editor">
+  <div class="step-editor__field">
+    <span class="step-editor__label">
+      {{ messages.LABEL_STEP_NAME }}
+      <span class="step-editor__required">*</span>
+    </span>
+    <ex-input-field
+      class="step-editor__input"
+      [ngModel]="data.stepName"
+      (ngModelChange)="updateField('stepName', $event)"
+      [placeholder]="messages.PLACEHOLDER_STEP_NAME"
+    ></ex-input-field>
+  </div>
+
+  <div class="step-editor__field">
+    <span class="step-editor__label">{{ messages.LABEL_DISPLAY_STATUS }}</span>
+    <ex-input-field
+      class="step-editor__input"
+      [ngModel]="data.displayStatus"
+      (ngModelChange)="updateField('displayStatus', $event)"
+      [placeholder]="messages.PLACEHOLDER_DISPLAY_STATUS"
+    ></ex-input-field>
+  </div>
+
+  <div class="step-editor__row">
+    <div class="step-editor__field step-editor__field--policy">
+      <span class="step-editor__label">{{ messages.LABEL_POLICY }}</span>
+      <ex-radio
+        class="step-editor__radio-group"
+        [options]="policyOptions"
+        direction="horizontal"
+        [ngModel]="data.assignmentPolicy"
+        (ngModelChange)="setPolicy($event)"
+      ></ex-radio>
+    </div>
+
+    <div class="step-editor__field step-editor__field--half">
+      <span class="step-editor__label">{{ messages.LABEL_ASSIGNEES }}</span>
+      <div class="step-editor__assignees">
+        @for (assignee of data.assignees; track $index; let i = $index) {
+          <div class="step-editor__assignee-row">
+            <ex-dropdown
+              class="step-editor__dropdown step-editor__dropdown--mode"
+              [options]="assigneeModeOptions"
+              [ngModel]="assignee.mode"
+              (ngModelChange)="updateAssigneeMode(i, $event)"
+            ></ex-dropdown>
+
+            @if (assignee.mode === 'userId') {
+              <ex-input-field
+                class="step-editor__input step-editor__input--sm"
+                [ngModel]="assignee.userId"
+                (ngModelChange)="updateAssigneeValue(i, 'userId', $event)"
+                [placeholder]="messages.PLACEHOLDER_EMAIL"
+              ></ex-input-field>
+            } @else {
+              <ex-dropdown
+                class="step-editor__dropdown step-editor__dropdown--input-height"
+                [options]="roles"
+                [showSearch]="true"
+                [(ngModel)]="assignee.role"
+              ></ex-dropdown>
+            }
+
+            @if (data.assignees.length > 1) {
+              <ex-icon-button
+                class="step-editor__remove-assignee"
+                name="delete"
+                variant="ghost"
+                [size]="16"
+                nz-tooltip
+                (clicked)="removeAssignee(i)"
+              ></ex-icon-button>
+            }
+          </div>
+        }
+
+        <ex-button
+          class="step-editor__add-member"
+          variant="dashed"
+          size="small"
+          icon="add"
+          [iconSize]="16"
+          (click)="addAssignee()"
+        >
+          {{ messages.ADD_MEMBER }}
+        </ex-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-editor__row">
+    <div class="step-editor__field step-editor__field--half">
+      <ex-checkbox [checked]="data.allowReject" (checkedChange)="toggleAllowReject()">
+        {{ messages.LABEL_ALLOW_REJECT }}
+      </ex-checkbox>
+    </div>
+
+    <div class="step-editor__field step-editor__field--half">
+      <ex-checkbox [checked]="data.allowForceStop" (checkedChange)="toggleAllowForceStop()">
+        {{ messages.LABEL_FORCE_STOP }}
+      </ex-checkbox>
+    </div>
+  </div>
+
+  <div class="step-editor__field">
+    <span class="step-editor__label">{{ messages.LABEL_AUTO_CALL }}</span>
+    <ex-input-field
+      class="step-editor__input"
+      [ngModel]="data.autoCallFunction"
+      (ngModelChange)="updateField('autoCallFunction', $event)"
+      [placeholder]="messages.PLACEHOLDER_AUTO_CALL"
+    ></ex-input-field>
+  </div>
+
+  <div class="step-editor__field">
+    <span class="step-editor__label">{{ messages.LABEL_APPROVE_LABEL }}</span>
+    <ex-input-field
+      class="step-editor__input"
+      [ngModel]="data.approveLabel"
+      (ngModelChange)="updateField('approveLabel', $event)"
+      [placeholder]="messages.PLACEHOLDER_APPROVE_LABEL"
+    ></ex-input-field>
+  </div>
+
+  @if (data.allowReject) {
+    <div class="step-editor__field">
+      <span class="step-editor__label">{{ messages.ON_REJECT_TO_PHASE_ORDER }}</span>
+      <div class="step-editor__reject-phase-control">
+        <input
+          #rejectPhaseInput
+          class="step-editor__native-number-input"
+        type="number"
+          inputmode="numeric"
+          [ngModel]="data.onRejectToPhaseOrder ?? 0"
+          [min]="0"
+          [max]="maxRejectPhase"
+          [step]="1"
+          (input)="syncRejectPhaseInput(rejectPhaseInput)"
+          (change)="syncRejectPhaseInput(rejectPhaseInput)"
+        (keydown)="preventRejectPhaseTyping($event)"
+        (paste)="preventRejectPhasePaste($event)"
+        (drop)="preventRejectPhaseDrop($event)"
+        (wheel)="preventRejectPhaseWheel($event)"
+        />
+
+        <div class="step-editor__input-meta">
+          <span class="step-editor__helper step-editor__helper--right">Max step: {{ maxRejectPhase }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-editor__field">
+      <span class="step-editor__label">{{ messages.LABEL_REJECT_LABEL }}</span>
+      <ex-input-field
+        class="step-editor__input"
+        [ngModel]="data.rejectLabel"
+        (ngModelChange)="updateField('rejectLabel', $event)"
+        [placeholder]="messages.PLACEHOLDER_REJECT_LABEL"
+      ></ex-input-field>
+    </div>
+  }
+
+  @if (data.allowForceStop) {
+    <div class="step-editor__field">
+      <span class="step-editor__label">{{ messages.LABEL_FORCE_STOP_LABEL }}</span>
+      <ex-input-field
+        class="step-editor__input"
+        [ngModel]="data.forceStopLabel"
+        (ngModelChange)="updateField('forceStopLabel', $event)"
+        [placeholder]="messages.PLACEHOLDER_FORCE_STOP_LABEL"
+      ></ex-input-field>
+    </div>
+  }
+</div>

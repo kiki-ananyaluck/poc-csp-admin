@@ -1,0 +1,464 @@
+<div class="srm-detail">
+  <div
+    class="srm-detail__page-loading"
+    [class.srm-detail__page-loading--visible]="isAccessChecking() || isPickupLoading() || isReassignLoading()"
+  >
+    <ex-spinning [spinning]="true"></ex-spinning>
+  </div>
+
+  <!-- Breadcrumb -->
+  <nz-breadcrumb class="srm-detail__breadcrumb" nzSeparator=">">
+    @for (item of breadcrumbs(); track $index) { @if (item.routerLink) {
+    <nz-breadcrumb-item>
+      <a [routerLink]="item.routerLink">{{ item.label }}</a>
+    </nz-breadcrumb-item>
+    } @else {
+    <nz-breadcrumb-item>{{ item.label }}</nz-breadcrumb-item>
+    } }
+  </nz-breadcrumb>
+
+  <div class="srm-detail__header">
+    <div class="srm-detail__header-main">
+      <h1 class="srm-detail__title">{{ messages.PAGE_TITLE }}</h1>
+
+      <div class="srm-detail__header-actions">
+        @if (showReassignButton()) {
+        <ex-button
+          variant="primary"
+          size="small"
+          icon="swap"
+          [iconSize]="16"
+          [disabled]="isReassignDisabled()"
+          (click)="openReassignModal()"
+        >
+          {{ messages.BTN_REASSIGN }}
+        </ex-button>
+        } @if (canPickup()) {
+        <ex-button
+          variant="primary"
+          size="small"
+          icon="arhive_fill"
+          [iconSize]="16"
+          [disabled]="isPickupLoading() || deciding() || isReassignLoading()"
+          (click)="onPickup()"
+        >
+          {{ messages.BTN_PICKUP }}
+        </ex-button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="srm-detail__info-container">
+    <div class="srm-detail__info-item">
+      <div class="srm-detail__info-label">{{ messages.LABEL_REF_NO }}</div>
+      <div class="srm-detail__info-value">{{ refNo() }}</div>
+    </div>
+
+    <div class="srm-detail__info-divider"></div>
+
+    <div class="srm-detail__info-item">
+      <div class="srm-detail__info-label">{{ messages.LABEL_SERVICE }}</div>
+      <div class="srm-detail__info-value">
+        <ex-tag variant="default" size="small">{{ service() }}</ex-tag>
+      </div>
+    </div>
+
+    <div class="srm-detail__info-divider"></div>
+
+    <div class="srm-detail__info-item">
+      <div class="srm-detail__info-label">
+        {{ messages.LABEL_COMPANY_NAME }}
+      </div>
+      <div class="srm-detail__info-value">{{ companyName() }}</div>
+    </div>
+
+    <div class="srm-detail__info-divider"></div>
+
+    <div class="srm-detail__info-item">
+      <div class="srm-detail__info-label">{{ messages.LABEL_STATUS }}</div>
+      <div class="srm-detail__info-value">
+        <ex-tag [variant]="getStatusDisplay(status()).variant" size="small">
+          {{ getStatusDisplay(status()).label }}
+        </ex-tag>
+      </div>
+    </div>
+
+    <div class="srm-detail__info-divider"></div>
+
+    <div class="srm-detail__info-item">
+      <div class="srm-detail__info-label">
+        {{ messages.LABEL_SUBMITTED_DATE }}
+      </div>
+      <div class="srm-detail__info-value">{{ submittedDate() }}</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="srm-detail__tabs">
+    <ex-tabs
+      [pages]="tabPages"
+      [(selectedIndex)]="selectedTab"
+      (tabChange)="onTabChange($event)"
+    ></ex-tabs>
+  </div>
+
+  <!-- Content Area -->
+  <div class="srm-detail__content">
+    @if (loadedTabs()[0]) {
+    <div
+      class="srm-detail__tab-panel--onboarding"
+      [style.display]="selectedTab() === 0 ? '' : 'none'"
+    >
+      @if (isLoadingDetail()) {
+      <div class="srm-detail__loading">
+        @for (i of [1,2,3]; track i) {
+        <div class="srm-detail__skeleton-item">
+          <div class="srm-detail__skeleton-icon"></div>
+          <div class="srm-detail__skeleton-content">
+            <div
+              class="srm-detail__skeleton-line srm-detail__skeleton-line--title"
+            ></div>
+            <div
+              class="srm-detail__skeleton-line srm-detail__skeleton-line--text"
+            ></div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else if (flowInstanceId()) {
+      <ex-onboarding
+        mode="admin"
+        [instanceId]="flowInstanceId()"
+        [class.srm-detail__onboarding--readonly]="showReassignButton()"
+        [class.srm-detail__onboarding--hide-rework]="showReassignButton() || isAllTabSource() || !showOnboardingReworkInput()"
+        (reviewChange)="onReview($event)"
+      />
+      } @else {
+      <div class="srm-detail__placeholder">
+        {{ messages.EMPTY_REQUEST_NOT_FOUND }}
+      </div>
+      }
+    </div>
+    } @if (loadedTabs()[1]) {
+    <div
+      class="srm-detail__tab-panel srm-detail__tab-panel--status-history"
+      [style.display]="selectedTab() === 1 ? '' : 'none'"
+    >
+      <!-- Tab 2: ประวัติสถานะ -->
+      @if (isLoadingHistory()) {
+      <div class="srm-detail__loading">
+        @for (i of [1,2,3]; track i) {
+        <div class="srm-detail__skeleton-item">
+          <div class="srm-detail__skeleton-icon"></div>
+          <div class="srm-detail__skeleton-content">
+            <div
+              class="srm-detail__skeleton-line srm-detail__skeleton-line--title"
+            ></div>
+            <div
+              class="srm-detail__skeleton-line srm-detail__skeleton-line--text"
+            ></div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <ex-status-history [items]="statusHistory()"></ex-status-history>
+      }
+    </div>
+    } @if (loadedTabs()[2]) {
+    <div
+      class="srm-detail__tab-panel srm-detail__tab-panel--edit-history"
+      [style.display]="selectedTab() === 2 ? '' : 'none'"
+    >
+      <!-- Tab 3: ประวัติการแก้ไขใบสมัคร -->
+      @if (isLoadingEditHistory()) {
+      <div class="srm-detail__loading">
+        @for (i of [1,2]; track i) {
+        <div class="srm-detail__skeleton-item">
+          <div class="srm-detail__skeleton-icon"></div>
+          <div class="srm-detail__skeleton-content">
+            <div
+              class="srm-detail__skeleton-line srm-detail__skeleton-line--title"
+            ></div>
+            <div
+              class="srm-detail__skeleton-line srm-detail__skeleton-line--text"
+            ></div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <ex-edit-history [rounds]="editHistory()"></ex-edit-history>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Action Buttons -->
+  @if (showBottomActions()) {
+  <div class="srm-detail__actions">
+    <ex-button
+      variant="neutral"
+      size="small"
+      icon="edit"
+      [iconSize]="16"
+      [disabled]="deciding() || reworkCount() === 0"
+      (click)="onSendBack()"
+    >
+      {{ messages.BTN_SEND_BACK }}
+    </ex-button>
+
+    <ex-button
+      variant="error"
+      size="small"
+      icon="close square"
+      [iconSize]="16"
+      [disabled]="deciding()"
+      (click)="onReject()"
+    >
+      {{ bottomRejectLabel() }}
+    </ex-button>
+
+    <ex-button
+      variant="primary"
+      size="small"
+      icon="check"
+      [iconSize]="16"
+      [disabled]="deciding()"
+      (click)="onApprove()"
+    >
+      {{ bottomPrimaryLabel() }}
+    </ex-button>
+  </div>
+  }
+
+  <ex-modal
+    [isOpen]="isApproveModalOpen()"
+    [leftButton]="{ label: messages.BTN_CANCEL, variant: 'text', action: handleApproveModalCancel }"
+    [rightButton]="{ label: bottomPrimaryLabel(), variant: 'primary', action: handleApproveModalConfirm }"
+    [rightButtonDisabled]="deciding()"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    (closed)="closeApproveModal()"
+  >
+    <div class="srm-detail__approve-modal">
+      <ex-icon
+        name="check"
+        [size]="64"
+        color="var(--color-primary-default)"
+      ></ex-icon>
+      <h3 class="srm-detail__approve-modal-title">{{ approveModalTitle() }}</h3>
+      <p class="srm-detail__approve-modal-message">
+        {{ approveModalDescription() }}
+      </p>
+    </div>
+  </ex-modal>
+
+  <ex-modal-input
+    [isOpen]="isRejectModalOpen()"
+    [title]="rejectModalTitle()"
+    [subtitle]="rejectModalSubtitle()"
+    [showTopDivider]="true"
+    [showCloseButton]="true"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    [leftButton]="{ label: messages.BTN_CANCEL, variant: 'text', action: handleRejectModalCancel }"
+    [rightButton]="{ label: bottomRejectLabel(), variant: 'error', icon: 'close square', action: handleRejectModalConfirm }"
+    [rightButtonDisabled]="isRejectSubmitDisabled()"
+    (closed)="closeRejectModal()"
+  >
+    <div class="srm-detail__reject-modal">
+      <textarea
+        class="srm-detail__reject-reason"
+        [value]="rejectReason()"
+        [placeholder]="messages.MODAL_REJECT_REASON_PLACEHOLDER"
+        rows="4"
+        maxlength="500"
+        (input)="onRejectReasonInput($event)"
+      ></textarea>
+      <div class="srm-detail__reject-reason-count">
+        {{ rejectReasonCount() }}/500
+      </div>
+    </div>
+  </ex-modal-input>
+
+  <ex-modal
+    [isOpen]="isReworkValidationModalOpen()"
+    [rightButton]="{ label: messages.MODAL_REWORK_REQUIRED_OK, variant: 'primary', action: handleReworkValidationModalOk }"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    (closed)="closeReworkValidationModal()"
+  >
+    <div class="srm-detail__rework-warning-modal">
+      <ex-icon
+        name="danger"
+        [size]="65"
+        color="var(--color-error-default, #f5222d)"
+      ></ex-icon>
+      <h3 class="srm-detail__rework-warning-title">
+        {{ messages.MODAL_REWORK_REQUIRED_TITLE }}
+      </h3>
+      <p class="srm-detail__rework-warning-message">
+        {{ messages.MODAL_REWORK_REQUIRED_SUBTITLE }}
+      </p>
+    </div>
+  </ex-modal>
+
+  <ex-modal
+    [isOpen]="isReworkConfirmModalOpen()"
+    [leftButton]="{ label: messages.MODAL_REWORK_CONFIRM_CANCEL, variant: 'text', action: handleReworkConfirmModalCancel }"
+    [rightButton]="{ label: messages.MODAL_REWORK_CONFIRM_SUBMIT, variant: 'primary', action: handleReworkConfirmModalSubmit }"
+    [rightButtonDisabled]="deciding()"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    (closed)="closeReworkConfirmModal()"
+  >
+    <div class="srm-detail__rework-confirm-modal">
+      <ex-icon
+        name="edit"
+        [size]="64"
+        color="var(--color-primary-default)"
+      ></ex-icon>
+      <h3 class="srm-detail__rework-confirm-title">
+        {{ messages.MODAL_REWORK_CONFIRM_TITLE }}
+      </h3>
+      <p class="srm-detail__rework-confirm-message">
+        {{ messages.MODAL_REWORK_CONFIRM_SUBTITLE }}
+      </p>
+    </div>
+  </ex-modal>
+
+  <ex-modal-input
+    [isOpen]="reassignModalOpen()"
+    [title]="messages.MODAL_REASSIGN_TITLE"
+    width="560px"
+    [showTopDivider]="true"
+    [showCloseButton]="true"
+    [closeOnBackdrop]="false"
+    [leftButton]="{ label: messages.MODAL_REASSIGN_CANCEL, variant: 'text', action: handleReassignModalCancel }"
+    [rightButton]="{ label: messages.MODAL_REASSIGN_CONFIRM, variant: 'primary', action: handleReassignModalConfirm }"
+    [rightButtonDisabled]="!reassigneeId || isReassignLoading()"
+    (closed)="closeReassignModal()"
+  >
+    <div class="srm-assignee-field">
+      <div class="srm-assignee-field__top-label">
+        {{ messages.MODAL_REASSIGN_ASSIGNEE_LABEL }}
+        <span class="srm-assignee-field__required">*</span>
+      </div>
+
+      <div
+        class="srm-custom-select"
+        [class.srm-custom-select--open]="assigneeDropdownOpen()"
+      >
+        @if (assigneeDropdownOpen()) {
+        <div
+          class="srm-custom-select__backdrop"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="messages.MODAL_REASSIGN_CLOSE_DROPDOWN_ARIA"
+          (click)="toggleAssigneeDropdown()"
+          (keydown.enter)="toggleAssigneeDropdown()"
+          (keydown.space)="toggleAssigneeDropdown()"
+        ></div>
+        }
+
+        <button
+          #assigneeTrigger
+          type="button"
+          class="srm-custom-select__trigger"
+          (click)="toggleAssigneeDropdown()"
+        >
+          @if (selectedAssignee) {
+          <div class="srm-assignee-option">
+            <span class="srm-assignee-option__name"
+              >{{ selectedAssignee.name }}</span
+            >
+            <span class="srm-assignee-option__position"
+              >{{ selectedAssignee.position }}</span
+            >
+            <span class="srm-assignee-option__department"
+              >{{ selectedAssignee.department }}</span
+            >
+          </div>
+          } @else {
+          <span class="srm-custom-select__placeholder"
+            >{{ messages.MODAL_REASSIGN_ASSIGNEE_PLACEHOLDER }}</span
+          >
+          }
+          <span class="srm-custom-select__arrow">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M11.9999 16.9139L3.58594 8.49994L4.99994 7.08594L11.9999 14.0859L18.9999 7.08594L20.4139 8.49994L11.9999 16.9139Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </ex-modal-input>
+
+  @if (assigneeDropdownOpen() && assigneePanelRect()) {
+  <div
+    class="srm-custom-select__panel"
+    [style.position]="'fixed'"
+    [style.top.px]="assigneePanelRect()!.top"
+    [style.left.px]="assigneePanelRect()!.left"
+    [style.width.px]="assigneePanelRect()!.width"
+  >
+    <div class="srm-custom-select__search">
+      <ex-search-input
+        [placeholder]="messages.MODAL_REASSIGN_SEARCH_PLACEHOLDER"
+        (valueChange)="assigneeSearchQuery.set($event)"
+      ></ex-search-input>
+    </div>
+    @if (filteredAssigneeOptions().length === 0) {
+    <div class="srm-custom-select__empty">
+      {{ messages.MODAL_REASSIGN_EMPTY }}
+    </div>
+    }
+    <div class="srm-custom-select__options">
+      @for (opt of filteredAssigneeOptions(); track opt.value) {
+      <button
+        type="button"
+        class="srm-custom-select__option"
+        [class.srm-custom-select__option--active]="reassigneeId === opt.value"
+        (click)="selectAssignee(opt)"
+      >
+        <div class="srm-assignee-option">
+          <span class="srm-assignee-option__name">{{ opt.name }}</span>
+          <span class="srm-assignee-option__position">{{ opt.position }}</span>
+          <span class="srm-assignee-option__department"
+            >{{ opt.department }}</span
+          >
+        </div>
+      </button>
+      }
+    </div>
+  </div>
+  }
+
+  <div class="srm-toast-floating">
+    <ex-toast
+      [visible]="showToast()"
+      [autoDismiss]="true"
+      [autoDismissTime]="5000"
+      [variant]="toastVariant()"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="dismissToast()"
+    >
+      {{ toastMessage() }}
+    </ex-toast>
+  </div>
+</div>

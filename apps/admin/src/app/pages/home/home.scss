@@ -1,0 +1,86 @@
+.home {
+  &__banner {
+    padding: var(--space-8) var(--space-10);
+    background: linear-gradient(135deg, var(--color-primary-secondary) 0%, var(--color-primary-secondary-hover) 100%);
+    margin-bottom: var(--space-8);
+  }
+
+  &__banner-title {
+    font-size: var(--size-h2);
+    font-weight: var(--weight-bold);
+    color: var(--color-primary-default);
+    margin: 0 0 var(--space-2);
+  }
+
+  &__banner-subtitle {
+    font-size: var(--size-body-md);
+    color: var(--color-primary-default);
+    margin: 0;
+  }
+
+  &__menu {
+    padding: 0 var(--space-10) var(--space-10);
+  }
+
+  &__menu-title {
+    font-size: 18px;
+    font-weight: var(--weight-semibold);
+    color: var(--color-neutral-700);
+    margin: 0 0 var(--space-5);
+  }
+
+  &__menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+  }
+
+  &__menu-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: var(--space-8) var(--space-4);
+    background: var(--color-neutral-0);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition:
+      box-shadow var(--normal) ease,
+      border-color var(--normal) ease;
+    min-height: 130px;
+    text-align: center;
+    outline: none;
+    color: var(--color-neutral-500);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border-color: var(--color-neutral-300);
+    }
+
+    &--disabled {
+      background: var(--color-neutral-50);
+      border-color: var(--color-neutral-200);
+      cursor: not-allowed;
+      color: var(--color-neutral-400);
+
+      .home__menu-card-label {
+        color: var(--color-neutral-400);
+      }
+    }
+  }
+
+  &__menu-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__menu-card-label {
+    font-size: var(--size-body-md);
+    font-weight: var(--weight-medium);
+    color: var(--color-neutral-700);
+    line-height: 1.5;
+  }
+}

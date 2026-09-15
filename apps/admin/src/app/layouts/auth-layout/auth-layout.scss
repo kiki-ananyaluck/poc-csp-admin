@@ -1,0 +1,106 @@
+@import '@exim/ui-kit/dist/css/design-tokens.css';
+
+.auth-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* SA-1143: เพิ่ม padding-bottom เท่ากับความสูง banner (~72px desktop, ~140px mobile)
+     เพื่อให้ login form ไม่ถูกบัง — ใช้ CSS custom property ที่ override ได้ */
+  // padding-bottom: var(--cookie-banner-height, 72px);
+
+  &__body {
+    display: flex;
+    flex: 1;
+    gap: 0;
+    position: relative;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  &__left {
+    flex: 0 0 40%;
+    background-image: url('/images/hero-banner.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+      flex: 0 0 auto;
+      min-height: 400px;
+      padding: 32px;
+    }
+  }
+
+  &__left-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  &__title {
+    background: linear-gradient(180deg, #0b3a60 0%, #034ea1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 56px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 32px;
+    }
+  }
+
+  &__subtitle {
+    background: linear-gradient(180deg, #18598d 0%, #034ea1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 40px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+
+    @media (max-width: 768px) {
+      font-size: 32px;
+    }
+  }
+
+  &__description {
+    color: var(--color-neutral-500);
+    font-size: var(--size-body-lg, 16px);
+    font-weight: 500;
+    margin: 12px 0 0 0;
+    line-height: 1.6;
+
+    @media (max-width: 768px) {
+      font-size: var(--size-body-md, 14px);
+    }
+  }
+
+  &__right {
+    flex: 1;
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 32px 0 0 32px;
+    margin-left: -32px;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 768px) {
+      padding: 32px 16px;
+      border-radius: 24px 24px 0 0;
+      margin-left: 0;
+      margin-top: -32px;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+<ex-modal-input
+  [title]="title()"
+  [subtitle]="subtitle()"
+  [subtitleAsHtml]="true"
+  [width]="'550px'"
+  [isOpen]="state.isOpenModal()"
+  (closed)="onLeaveCancel()"
+  [closeOnBackdrop]="false"
+  [leftButton]="leaveCancelButton"
+  [rightButton]="leaveConfirmButton"
+  [showTopDivider]="true"
+  [showCloseButton]="true"
+  [attr.data-testid]="ID.leaveModal"
+>
+  <ex-dynamic-form
+    [config]="formConfig()"
+    [form]="state.bankForm"
+    (submitForm)="onLogin($event)"
+  >
+  </ex-dynamic-form>
+</ex-modal-input>

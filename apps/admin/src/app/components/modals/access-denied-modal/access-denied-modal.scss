@@ -1,0 +1,25 @@
+@import '@exim/ui-kit/dist/css/design-tokens.css';
+
+.access-denied-modal {
+  text-align: center;
+  padding: 8px 0;
+
+  &__icon {
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  &__title {
+    margin: 0 0 12px;
+    font-size: var(--size-h3);
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  &__description {
+    margin: 0;
+    color: var(--color-text-secondary, #666);
+    font-size: var(--size-body-lg, 14px);
+    line-height: 1.6;
+  }
+}

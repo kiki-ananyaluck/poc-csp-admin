@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.term-breadcrumb {
+  font-size: var(--font-sizes-body-sm, 13px);
+  color: var(--color-neutral-500, #565656);
+
+  .term-breadcrumb__link-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+  }
+
+  .term-breadcrumb__link-btn:hover {
+    text-decoration: underline;
+  }
+
+  nz-breadcrumb-item:last-child {
+    color: #000000;
+  }
+}

@@ -1,0 +1,22 @@
+.dmt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  min-height: 100%;
+}
+
+.dmt__toast-wrap {
+  position: sticky;
+  bottom: 80px;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+
+  ex-toast {
+    pointer-events: all;
+  }
+}
+ 

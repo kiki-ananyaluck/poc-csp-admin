@@ -1,0 +1,78 @@
+.dmt {
+  &__breadcrumb {
+    font-size: var(--font-sizes-body-sm, 13px);
+    color: var(--color-neutral-500, #565656);
+
+    nz-breadcrumb-item:last-child {
+      color: #000000;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: var(--font-sizes-h3, 24px);
+    font-weight: var(--font-weights-bold, 700);
+    line-height: var(--line-heights-h3, 36px);
+    margin: 0;
+    color: var(--color-neutral-900, #565656);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  // ปุ่ม outline รอง — ใช้ display:contents ให้ flex layout ของ actions ยังทำงานได้
+  // CSS variable --color-exim-blue ถูก inherit ลงไปยัง ex-button ลูกทุกตัว
+  &__secondary-actions {
+    display: contents;
+    --color-exim-blue: var(--color-neutral-500, #565656);
+  }
+
+  &__download-wrap {
+    position: relative;
+  }
+
+  &__download-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    left: auto;
+    z-index: 100;
+    background: var(--color-neutral-0, #ffffff);
+    border: 1px solid var(--color-neutral-200, #d9d9d9);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: var(--space-2, 8px);
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    // สี text button ใน menu ให้เป็น neutral
+    --color-exim-blue: var(--color-neutral-500, #565656);
+
+    // style HOST element ของ ex-button โดยตรง (ไม่ใช่ ::ng-deep)
+    ex-button {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--color-neutral-200, #d9d9d9);
+      border-radius: var(--radius-sm, 8px);
+      overflow: hidden;
+
+      &:hover {
+        border-color: var(--color-neutral-300, #bfbfbf);
+        background-color: var(--color-neutral-50, #f7f7f7);
+      }
+    }
+  }
+}

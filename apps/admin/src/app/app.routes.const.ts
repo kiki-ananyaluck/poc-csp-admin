@@ -1,0 +1,17 @@
+export const APP_ROUTE_PATHS = {
+  HOME: '/home',
+  LOGIN: '/login',
+  DASHBOARD: '/dashboard',
+  CODEX: '/codex',
+  DOCUMENT_NUMBERS: '/document-numbers',
+  DOCUMENT_NUMBERS_API_DEMO: '/document-numbers/api-demo',
+  SETTINGS: '/settings',
+  NOTIFICATION: '/notification',
+  APP_STATUS: '/app-status',
+  FORBIDDEN: '/403',
+  HEALTH_CHECK: '/health-check',
+  TERM_SERVICE: '/term-service',
+  APPLICATION_TRACKING: '/application-tracking',
+  SERVICE_REQUEST_MANAGEMENT: '/service-request-management',
+  SERVICE_REQUEST_MANAGEMENT_DETAIL: '/service-request-management/:id',
+} as const;

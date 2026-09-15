@@ -1,0 +1,152 @@
+<div class="term-detail" [attr.data-testid]="selectors.HOST">
+  <ex-spinning [spinning]="state.isLoading()">
+    @if (state.detail(); as detail) {
+    <!-- Breadcrumb -->
+    <app-term-breadcrumb
+      [items]="breadcrumbItems"
+      [testId]="selectors.BREADCRUMB"
+    ></app-term-breadcrumb>
+
+    <!-- Header -->
+    <div class="term-detail__header">
+      <h1 class="term-detail__title">{{ detail.name }}</h1>
+      <ex-button
+        variant="primary"
+        size="small"
+        [attr.data-testid]="selectors.BTN_CREATE_VERSION"
+        (click)="onCreateVersion()"
+      >
+        {{ messages.BTN_CREATE_VERSION }}
+      </ex-button>
+    </div>
+
+    <!-- Info Card -->
+    <app-term-info-card [testId]="selectors.INFO_CARD">
+      <app-term-info-item [label]="messages.INFO_CODE">
+        <span class="term-info-value">{{ detail.code }}</span>
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_TYPE">
+        <ex-tag variant="info" icon="lock"
+          >{{ messages.TYPE_MANDATORY }}</ex-tag
+        >
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_VERSION_COUNT">
+        <span class="term-info-value"
+          >{{ detail.versionCount }} ({{ detail.latestVersion }})</span
+        >
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_LAST_UPDATED">
+        <span class="term-info-value">{{ detail.lastUpdated }}</span>
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_CREATED_BY">
+        <span class="term-info-value">{{ detail.operationBy || '-' }}</span>
+      </app-term-info-item>
+    </app-term-info-card>
+
+    <!-- Version Table -->
+    <div #versionTableWrapper>
+      <ex-table
+        class="term-detail__table"
+        [data]="$any(detail.versions)"
+        [total]="detail.versions.length"
+        [showCustomPagination]="false"
+        [attr.data-testid]="selectors.TABLE"
+        (columnSortChange)="onColumnSort($event)"
+      >
+        <ex-column
+          key="version"
+          [title]="messages.COL_VERSION"
+          [sort]="{ show: true, fn: true }"
+        ></ex-column>
+        <ex-column
+          key="addedAt"
+          [title]="messages.COL_ADDED_AT"
+          [sort]="{ show: true, fn: true }"
+        ></ex-column>
+        <ex-column
+          key="addedBy"
+          [title]="messages.COL_ADDED_BY"
+          [sort]="{ show: true, fn: true }"
+        >
+          <ng-template exCell let-value>
+            <span>{{ value }}</span>
+          </ng-template>
+        </ex-column>
+        <ex-column
+          key="status"
+          [title]="messages.COL_STATUS"
+          [sort]="{ show: true, fn: true }"
+        >
+          <ng-template exCell let-value>
+            <app-term-status-badge
+              [status]="value"
+              [publishedLabel]="messages.STATUS_PUBLISHED"
+              [inactiveLabel]="messages.STATUS_INACTIVE"
+            ></app-term-status-badge>
+          </ng-template>
+        </ex-column>
+        <ex-column key="version" title="" align="right" width="280px">
+          <ng-template exCell let-row="row">
+            <div class="term-detail__row-actions">
+              <ex-icon-button
+                name="edit"
+                (clicked)="onEditStatus($any(row)['version'], $any(row)['status'])"
+              ></ex-icon-button>
+              <ex-button
+                variant="outline"
+                outlineColor="var(--semantic-color-neutral-500, #616161)"
+                size="small"
+                icon="document"
+                [iconSize]="16"
+                [attr.data-testid]="selectors.BTN_DETAIL"
+                (click)="onViewDetail($any(row)['version'])"
+              >
+                {{ messages.BTN_DETAIL }}
+              </ex-button>
+              <ex-button
+                variant="outline"
+                outlineColor="var(--semantic-color-neutral-500, #616161)"
+                size="small"
+                icon="profile"
+                [iconSize]="16"
+                [attr.data-testid]="selectors.BTN_OPERATORS"
+                (click)="onViewOperators($any(row)['version'])"
+              >
+                {{ messages.BTN_OPERATORS }}
+              </ex-button>
+            </div>
+          </ng-template>
+        </ex-column>
+      </ex-table>
+    </div>
+
+    } @else if (!state.isLoading()) {
+    <div class="term-detail__not-found">{{ messages.NOT_FOUND }}</div>
+    }
+  </ex-spinning>
+
+  @if (state.showToast()) {
+  <div class="term-detail__toast-wrap">
+    <ex-toast
+      [variant]="state.toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="state.dismissToast()"
+      >{{ state.toastMessage() }}</ex-toast
+    >
+  </div>
+  }
+</div>
+
+<app-term-edit-status-modal
+  [modal]="state.editModal()"
+  [title]="messages.MODAL_EDIT_TITLE"
+  [options]="editStatusOptions"
+  [cancelLabel]="messages.MODAL_BTN_CANCEL"
+  [saveLabel]="messages.MODAL_BTN_SAVE"
+  (closed)="state.closeEditModal()"
+  (selectionChange)="onSelectEditStatus($event)"
+  (save)="state.saveEditStatus()"
+></app-term-edit-status-modal>

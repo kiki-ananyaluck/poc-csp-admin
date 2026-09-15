@@ -1,0 +1,137 @@
+.workflow-approval {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  min-height: 100%;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-neutral-800, #2e2e2e);
+    margin: 0;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    gap: 12px;
+
+    &-icon {
+      font-size: 48px;
+      opacity: 0.5;
+    }
+
+    &-text {
+      font-size: 16px;
+      color: var(--color-neutral-600, #8c8c8c);
+      margin: 0;
+    }
+  }
+
+  &__link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: var(--color-primary-default, #034ea1);
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  &__dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__dialog-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--color-neutral-700, #595959);
+    }
+  }
+
+  &__dialog-warning {
+    margin: 0;
+    padding: 8px 12px;
+    background: #fff2f0;
+    border: 1px solid #ffccc7;
+    border-radius: 4px;
+    color: var(--color-error-default, #ff4d4f);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  &__dialog-note {
+    margin: 0;
+    padding: 8px 12px;
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 4px;
+    color: #389e0d;
+    font-size: 13px;
+  }
+
+  &__dialog-remark {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-neutral-700, #595959);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--color-neutral-400, #d9d9d9);
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: var(--font-families-base, 'Anuphan', sans-serif);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s ease;
+
+      &:focus {
+        border-color: var(--color-primary-default, #034ea1);
+      }
+
+      &--error {
+        border-color: var(--color-error-default, #ff4d4f);
+      }
+    }
+  }
+
+  &__dialog-error {
+    font-size: 12px;
+    color: var(--color-error-default, #ff4d4f);
+  }
+}

@@ -1,0 +1,23 @@
+<nz-breadcrumb
+  class="term-breadcrumb"
+  nzSeparator=">"
+  [attr.data-testid]="testId"
+>
+  @for (item of items; track $index) { @if (!$last) {
+  <nz-breadcrumb-item>
+    @if (item.routerLink) {
+    <a [routerLink]="item.routerLink">{{ item.label }}</a>
+    } @else {
+    <button
+      type="button"
+      class="term-breadcrumb__link-btn"
+      (click)="item.click?.()"
+    >
+      {{ item.label }}
+    </button>
+    }
+  </nz-breadcrumb-item>
+  } @else {
+  <nz-breadcrumb-item>{{ item.label }}</nz-breadcrumb-item>
+  } }
+</nz-breadcrumb>

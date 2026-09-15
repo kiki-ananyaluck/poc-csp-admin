@@ -1,0 +1,201 @@
+<div class="dmt">
+  <app-dmt-toolbar
+    class="document-number-toolbar"
+    [pageTitle]="pageTitle"
+    [breadcrumbs]="breadcrumbs"
+    [showDownloadTemplate]="false"
+    [showImport]="false"
+  ></app-dmt-toolbar>
+
+  <div class="dmt__search-row">
+    <ex-search-input
+      class="dmt__search-input"
+      [placeholder]="messages.CONFIG_CODE_PLACEHOLDER"
+      (valueChange)="onSearchInput($event)"
+    ></ex-search-input>
+
+    <ex-button
+      variant="neutral"
+      size="small"
+      [disabled]="isLoading()"
+      (click)="loadRows()"
+      >{{ messages.REFRESH_BUTTON }}</ex-button
+    >
+    <div class="dmt__filter-wrap">
+      <ex-button
+        variant="neutral"
+        size="small"
+        icon="filter"
+        [iconSize]="16"
+        (click)="toggleFilterPanel()"
+        >{{ messages.FILTER_BUTTON }}</ex-button
+      >
+
+      @if (isFilterPanelOpen()) {
+      <div class="dmt__filter-panel">
+        <div class="dmt__filter-panel-header">
+          <span class="dmt__filter-panel-title"
+            >{{ messages.FILTER_PANEL_TITLE }}</span
+          >
+          <ex-button variant="text" size="small" (click)="onFilterClear()"
+            >{{ messages.FILTER_CLEAR }}</ex-button
+          >
+        </div>
+        <hr class="dmt__filter-divider" />
+        <div class="dmt__filter-section">
+          <p class="dmt__filter-section-label">
+            {{ messages.FILTER_POLICY_LABEL }}
+          </p>
+
+          @for (policy of filteredPolicies(); track policy.id) {
+          <div class="dmt__filter-policy-item">
+            <ex-checkbox
+              [checked]="isPendingChecked(policy.policyCode)"
+              (checkedChange)="onPendingPolicyToggle(policy.policyCode, $event)"
+              >{{ policy.policyCode }}</ex-checkbox
+            >
+            <span class="dmt__filter-policy-desc"
+              >{{ policy.description }}</span
+            >
+          </div>
+          }
+        </div>
+        <hr class="dmt__filter-divider" />
+        <div class="dmt__filter-panel-footer">
+          <ex-button variant="outline" size="small" (click)="onFilterCancel()"
+            >{{ messages.FILTER_CANCEL }}</ex-button
+          >
+          <ex-button variant="primary" size="small" (click)="onFilterApply()"
+            >{{ messages.FILTER_APPLY }}</ex-button
+          >
+        </div>
+      </div>
+      }
+    </div>
+    <ex-button variant="outline" size="small" (click)="goToApiDemo()"
+      >{{ messages.API_DEMO_BUTTON }}</ex-button
+    >
+  </div>
+
+  <div class="dmt__filter-total-row">
+    <div class="dmt__active-filter-row">
+      <span class="dmt__active-filter-label"
+        >{{ messages.TRACKED_CODES_LABEL }}</span
+      >
+      @for (configCode of trackedConfigCodes(); track configCode) {
+      <span class="dmt__active-filter-chip">
+        {{ configCode }}
+        <button
+          type="button"
+          class="dmt__active-filter-chip-close"
+          (click)="removeConfigCode(configCode)"
+          aria-label="Remove"
+        >
+          ×
+        </button>
+      </span>
+      }
+    </div>
+    <div class="dmt__total">
+      {{ messages.TOTAL_LABEL }}: <strong>{{ rows().length }}</strong>
+      {{ messages.TOTAL_UNIT }}
+    </div>
+  </div>
+
+  @if (errorMessage(); as message) {
+  <p class="dmt__error">{{ message }}</p>
+  } @if (errors().length > 0) {
+  <section class="dmt__warning">
+    <h2>{{ messages.LOAD_PARTIAL_WARNING }}</h2>
+    <ul>
+      @for (err of errors(); track err.configCode) {
+      <li>{{ err.configCode }}: {{ err.message }}</li>
+      }
+    </ul>
+  </section>
+  }
+
+  <ex-table [data]="rows()" [total]="rows().length" [loading]="isLoading()">
+    <ex-column
+      key="configCode"
+      [title]="messages.TABLE_COL_CONFIG_CODE"
+      width="140px"
+    ></ex-column>
+    <ex-column
+      key="policyDescription"
+      [title]="messages.TABLE_COL_POLICY_DESCRIPTION"
+    >
+    </ex-column>
+    <ex-column
+      key="policyStatus"
+      [title]="messages.TABLE_COL_POLICY_STATUS"
+      width="140px"
+    >
+      <ng-template exCell let-value>
+        @if ((value ?? '').toString().toUpperCase() === 'ACTIVE') {
+        <ex-tag variant="success">ACTIVE</ex-tag>
+        } @else {
+        <ex-tag variant="default-light">{{ value }}</ex-tag>
+        }
+      </ng-template>
+    </ex-column>
+    <ex-column
+      key="currentNumber"
+      [title]="messages.TABLE_COL_CURRENT_NUMBER"
+      width="140px"
+    ></ex-column>
+    <ex-column
+      key="nextDocumentNumber"
+      [title]="messages.TABLE_COL_NEXT_DOCUMENT_NUMBER"
+    ></ex-column>
+    <ex-column key="actions" [title]="messages.TABLE_COL_ACTIONS" width="220px">
+      <ng-template exCell let-row="row">
+        <div class="dmt__table-actions">
+          <ex-button
+            variant="text"
+            size="small"
+            (click)="goToDetail(row.configCode)"
+            >{{ messages.VIEW_BUTTON }}</ex-button
+          >
+          <ex-button
+            variant="outline"
+            size="small"
+            [disabled]="!isRowActive(row)"
+            (click)="openResetModal(row)"
+            >{{ messages.RESET_BUTTON }}</ex-button
+          >
+        </div>
+      </ng-template>
+    </ex-column>
+  </ex-table>
+
+  <ex-modal
+    [isOpen]="isResetModalOpen()"
+    [title]="messages.RESET_MODAL_TITLE"
+    [leftButton]="resetCancelButton"
+    [rightButton]="resetConfirmButton"
+    [rightButtonDisabled]="isLoading()"
+    (isOpenChange)="isResetModalOpen.set($any($event))"
+  >
+    <div class="dmt__modal-content">
+      <p>{{ messages.RESET_MODAL_DESC }}</p>
+      @if (resetTarget(); as target) {
+      <p><strong>{{ target.configCode }}</strong></p>
+      }
+    </div>
+  </ex-modal>
+
+  @if (toastMessage(); as message) {
+  <div class="dmt__toast-wrap">
+    <ex-toast
+      [variant]="toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="dismissToast()"
+      >{{ message }}</ex-toast
+    >
+  </div>
+  }
+</div>

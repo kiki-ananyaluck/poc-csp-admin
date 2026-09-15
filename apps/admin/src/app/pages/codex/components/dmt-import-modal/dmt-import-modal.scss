@@ -1,0 +1,228 @@
+.dmt-import-modal {
+  // ทำให้ ex-modal มี border-radius 16px ผ่าน CSS variable — ไม่ต้องใช้ ::ng-deep
+  --ex-modal-content-radius: 16px;
+  // ─── Header (title + close button) ────────────────────────────────────────
+  // margin negative ชดเชย padding: 16px ของ ex-modal .modal-content
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -16px -16px 0;
+    padding: var(--space-4, 16px) var(--space-6, 24px);
+  }
+
+  &__title {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-h4, 18px);
+    font-weight: var(--font-weights-bold, 700);
+    color: var(--color-neutral-900, #1a1a1a);
+    line-height: 1.4;
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    cursor: pointer;
+    color: var(--color-neutral-500, #595959);
+    flex-shrink: 0;
+
+    &:hover {
+      background: var(--color-neutral-50, #f7f7f7);
+    }
+  }
+
+  &__body {
+    margin: 0 -16px -16px;
+    padding: 20px var(--space-6, 24px) var(--space-6, 24px);
+
+    // host element ของ ex-form-alert — ตั้ง margin ได้โดยไม่ต้อง ::ng-deep
+    ex-form-alert {
+      display: block;
+      margin-bottom: var(--space-4, 16px);
+    }
+  }
+
+  // ─── Processing banner ─────────────────────────────────────────────────────
+  &__processing-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: var(--space-4, 16px);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--color-primary-secondary, #e6f0fa);
+    border: 1px solid var(--color-primary-100, #b3d1f5);
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    color: var(--color-primary-default, #034ea1);
+  }
+
+  &__processing-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-primary-default, #034ea1);
+    flex-shrink: 0;
+  }
+
+  // ─── File entry ────────────────────────────────────────────────────────────
+  &__file-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px var(--space-4, 16px);
+    border: 1px solid var(--color-neutral-200, #d9d9d9);
+    border-radius: var(--radius-md, 10px);
+    background: var(--color-neutral-0, #ffffff);
+  }
+
+  &__file-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm, 8px);
+    background: var(--color-primary-secondary, #e6f0fa);
+    flex-shrink: 0;
+  }
+
+  &__file-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__file-type {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-caption, 12px);
+    color: var(--color-neutral-500, #595959);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  &__file-name {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    font-weight: var(--font-weights-semibold, 600);
+    color: var(--color-neutral-900, #1a1a1a);
+    margin: 2px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // ─── Processing footer ─────────────────────────────────────────────────────
+  &__processing-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2, 8px);
+    margin-top: 20px;
+  }
+
+  // ─── Fault view ────────────────────────────────────────────────────────────
+  &__fault-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-4, 16px) 0 var(--space-2, 8px);
+    gap: 10px;
+  }
+
+  &__fault-title {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-h4, 18px);
+    font-weight: var(--font-weights-bold, 700);
+    color: var(--color-neutral-900, #000000);
+    margin: var(--space-1, 4px) 0 0;
+  }
+
+  &__fault-desc {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    color: var(--color-neutral-500, #595959);
+    margin: 0;
+    max-width: 300px;
+    line-height: 1.6;
+  }
+
+  // ─── Upload area ───────────────────────────────────────────────────────────
+  &__upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 2px dashed var(--color-neutral-300, #c4c4c4);
+    border-radius: var(--radius-lg, 12px);
+    padding: 40px var(--space-6, 24px) 32px;
+    background: var(--color-neutral-50, #fafafa);
+    text-align: center;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: var(--color-primary-default, #034ea1);
+    }
+  }
+
+  &__upload-title {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-lg, 16px);
+    font-weight: var(--font-weights-semibold, 600);
+    color: var(--color-neutral-800, #2e2e2e);
+    margin: 12px 0 4px;
+  }
+
+  &__upload-hint {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-sm, 13px);
+    color: var(--color-neutral-500, #595959);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  &__upload-or {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-sm, 13px);
+    color: var(--color-neutral-400, #8c8c8c);
+    margin: var(--space-2, 8px) 0 4px;
+  }
+
+  // ปุ่มเลือกไฟล์ — outline variant (border+text: exim-blue) + bg ฟ้าอ่อนผ่าน HOST element (ไม่ต้อง ::ng-deep)
+  // outline button มี background: transparent ทำให้ HOST background โชวผ่านได้
+  &__select-btn {
+    background-color: var(--color-primary-secondary, #e6f0fa);
+    border-radius: var(--radius-md, 10px);
+    overflow: hidden;
+
+    ::ng-deep button {
+      border-color: transparent !important;
+    }
+  }
+}
+
+.dmt {
+  &__toast-wrap {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+  }
+
+  &__toast-message {
+    margin: 0;
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    font-weight: var(--font-weights-medium, 500);
+  }
+}

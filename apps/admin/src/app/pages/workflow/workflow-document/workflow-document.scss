@@ -1,0 +1,257 @@
+.workflow-doc {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  min-height: 100%;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2e2e2e;
+    margin: 0;
+  }
+
+  &__header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__doc-id {
+    font-size: 14px;
+    font-weight: 500;
+    color: #595959;
+  }
+
+  &__biz-type {
+    font-size: 13px;
+    color: #8c8c8c;
+    padding: 2px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: #8c8c8c;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2e2e2e;
+    margin: 0;
+  }
+
+  &__step-card {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__step-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__step-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2e2e2e;
+  }
+
+  &__step-progress {
+    font-size: 13px;
+    color: #595959;
+    margin-left: auto;
+  }
+
+  &__assignees {
+    overflow-x: auto;
+  }
+
+  &__assignee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      font-weight: 600;
+      color: #595959;
+      background: #ffffff;
+    }
+
+    td {
+      color: #2e2e2e;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  &__history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      font-weight: 600;
+      color: #595959;
+      background: #fafafa;
+    }
+
+    td {
+      color: #2e2e2e;
+    }
+  }
+
+  &__empty {
+    color: #8c8c8c;
+    font-size: 14px;
+    text-align: center;
+    padding: 24px;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__search-input {
+    flex: 1;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+      border-color: #034ea1;
+      box-shadow: 0 0 0 2px rgba(3, 78, 161, 0.12);
+    }
+  }
+
+  &__not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: #8c8c8c;
+    background: #fafafa;
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+    text-align: center;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+
+  &__error {
+    color: #cf1322;
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  &__modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0;
+  }
+
+  &__modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #595959;
+    }
+
+    .required {
+      color: #ff4d4f;
+    }
+
+    input, textarea {
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+      resize: vertical;
+
+      &:focus {
+        border-color: #034ea1;
+      }
+    }
+  }
+
+  &__assignee-edit-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  &__toast-wrap {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1000;
+  }
+}

@@ -1,0 +1,19 @@
+<div class="action-picker">
+
+  <div class="action-picker__list">
+    @if (filteredActions.length > 0) {
+      @for (action of filteredActions; track action.id) {
+        <button
+          class="action-picker__item"
+          [class.action-picker__item--danger]="action.id === 'delete'"
+          (click)="selectAction(action.id)"
+          type="button"
+        >
+          <span class="action-picker__item-label">{{ action.label }}</span>
+        </button>
+      }
+    } @else {
+      <div class="action-picker__empty">{{ emptyStateLabel }}</div>
+    }
+  </div>
+</div>

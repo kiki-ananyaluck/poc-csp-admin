@@ -1,0 +1,20 @@
+<div class="login">
+  <div class="login__card">
+    <img
+      [src]="messages.LOGO_SRC"
+      [alt]="messages.LOGO_ALT"
+      class="login__logo"
+    />
+    <h2 class="login__title">{{ messages.TITLE }}</h2>
+    <p class="login__subtitle">{{ messages.SUBTITLE }}</p>
+    <ex-button variant="primary" [width]="'100%'" (click)="onLogin()">
+      <img
+        src="/images/microsoft.png"
+        alt="Microsoft"
+        width="20"
+        height="20"
+        style="flex-shrink: 0"
+      />&nbsp;&nbsp;{{ messages.LOGIN_BUTTON }}
+    </ex-button>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<div class="document-number-detail">
+  <ex-button
+    class="document-number-detail__back"
+    variant="text"
+    size="small"
+    icon="arrow_left"
+    [iconSize]="16"
+    (click)="backToList()"
+    >{{ messages.BACK_BUTTON }}</ex-button
+  >
+
+  <header class="document-number-detail__header">
+    <h1>{{ messages.PAGE_TITLE_PREFIX }}: {{ configCode() }}</h1>
+    <div class="document-number-detail__actions">
+      <ex-button
+        variant="primary"
+        size="small"
+        [disabled]="isLoading()"
+        (click)="generate()"
+        >{{ messages.GENERATE_BUTTON }}</ex-button
+      >
+      <ex-button
+        variant="outline"
+        size="small"
+        [disabled]="isLoading()"
+        (click)="openResetModal()"
+        >{{ messages.RESET_BUTTON }}</ex-button
+      >
+      <ex-button
+        variant="outline"
+        size="small"
+        [disabled]="isLoading()"
+        (click)="loadCurrent()"
+        >{{ messages.REFRESH_BUTTON }}</ex-button
+      >
+    </div>
+  </header>
+
+  @if (errorMessage(); as message) {
+  <p class="document-number-detail__error">{{ message }}</p>
+  }
+
+  <section class="document-number-detail__card">
+    <h2>{{ messages.CARD_TITLE }}</h2>
+    @if (isLoading()) {
+    <p>{{ messages.LOADING }}</p>
+    } @else if (current(); as currentData) {
+    <dl>
+      <div>
+        <dt>{{ messages.FIELD_CONFIG_CODE }}</dt>
+        <dd>{{ currentData.configCode }}</dd>
+      </div>
+      <div>
+        <dt>{{ messages.FIELD_FORMAT_PATTERN }}</dt>
+        <dd>{{ currentData.formatPattern }}</dd>
+      </div>
+      <div>
+        <dt>{{ messages.FIELD_RESET_CYCLE }}</dt>
+        <dd>
+          <ex-tag variant="default-light">{{ currentData.resetCycle }}</ex-tag>
+        </dd>
+      </div>
+      <div>
+        <dt>{{ messages.FIELD_CURRENT_NUMBER }}</dt>
+        <dd>{{ currentData.currentNumber }}</dd>
+      </div>
+      <div>
+        <dt>{{ messages.FIELD_NEXT_DOCUMENT_NUMBER }}</dt>
+        <dd>{{ currentData.nextDocumentNumber }}</dd>
+      </div>
+      <div>
+        <dt>{{ messages.FIELD_LAST_RESET_AT }}</dt>
+        <dd>{{ currentData.lastResetAt | date: 'yyyy-MM-dd HH:mm:ss' }}</dd>
+      </div>
+    </dl>
+    } @else {
+    <p>{{ messages.NO_DATA }}</p>
+    }
+  </section>
+
+  <ex-modal
+    [isOpen]="isResetModalOpen()"
+    [title]="messages.RESET_MODAL_TITLE"
+    [leftButton]="resetCancelButton"
+    [rightButton]="resetConfirmButton"
+    [rightButtonDisabled]="isLoading()"
+    (isOpenChange)="isResetModalOpen.set($any($event))"
+  >
+    <div class="document-number-detail__modal-content">
+      <p>{{ messages.RESET_MODAL_DESC }}</p>
+      <p><strong>{{ configCode() }}</strong></p>
+      @if (latestReset(); as resetData) {
+      <p>
+        {{ messages.FIELD_CURRENT_NUMBER }}: {{ resetData.previousNumber }} ->
+        {{ resetData.resetTo }}
+      </p>
+      }
+    </div>
+  </ex-modal>
+
+  @if (toastMessage(); as message) {
+  <div class="document-number-detail__toast-wrap">
+    <ex-toast
+      [variant]="toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="dismissToast()"
+      >{{ message }}</ex-toast
+    >
+  </div>
+  }
+</div>

@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@100;200;300;400;500;600;700&family=Sarabun:wght@100;200;300;400;500;600;700;800&display=swap');
+@import 'ng-zorro-antd/ng-zorro-antd.min.css';
+@import '@exim/ui-kit/dist/css/design-tokens.css';
+
+* {
+  font-family: var(--font-families-base) !important;
+}
+
+// Allow multi-line option labels in nz-select dropdowns
+.ant-select-item-option-content {
+  white-space: pre-line;
+}
+
+// Ensure date picker dropdown appears above all overlays
+.ant-picker-dropdown,
+.srm-date-picker-dropdown {
+  z-index: 2000 !important;
+}
+
+// Ensure date picker panel is visible
+.ant-picker-panel-container {
+  z-index: 2000 !important;
+}

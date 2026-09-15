@@ -1,0 +1,19 @@
+<div class="app-status">
+  <!-- Page header -->
+  <div class="app-status__header">
+    <h1 class="app-status__title">{{ messages.PAGE_TITLE }}</h1>
+    <p class="app-status__subtitle">{{ messages.PAGE_SUBTITLE }}</p>
+  </div>
+
+  <!-- Table + selection bar -->
+  <app-status-table
+    (manageStatusClick)="onManageStatusClick($event)"
+    (bulkMaintenanceClick)="onBulkMaintenanceClick()"
+  ></app-status-table>
+</div>
+
+<!-- Modal: จัดการสถานะ (single item) -->
+<app-status-modal></app-status-modal>
+
+<!-- Modal: เพิ่มรายละเอียดประกอบสถานะ (bulk Maintenance) -->
+<app-bulk-description-modal></app-bulk-description-modal>

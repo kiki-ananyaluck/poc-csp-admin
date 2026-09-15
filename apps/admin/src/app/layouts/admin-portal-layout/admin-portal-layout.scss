@@ -1,0 +1,6 @@
+// Styles are provided by ex-layout from @exim/ui-kit.
+// Add app-specific overrides here if needed.
+
+:host ::ng-deep .logo {
+  cursor: pointer;
+}

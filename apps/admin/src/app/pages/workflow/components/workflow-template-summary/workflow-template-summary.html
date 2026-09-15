@@ -1,0 +1,287 @@
+<div class="wts">
+  <div class="wts__header">
+    <h2 class="wts__title">{{ messages.SUMMARY_TITLE }}</h2>
+    <p class="wts__subtitle">{{ messages.SUMMARY_SUBTITLE }}</p>
+  </div>
+
+  <div class="wts__meta">
+    <div class="wts__meta-row">
+      <span class="wts__meta-label">{{ messages.SUMMARY_LABEL_CODE }}</span>
+      <span class="wts__meta-value">{{ summaryCode || '-' }}</span>
+    </div>
+    <div class="wts__meta-row">
+      <span class="wts__meta-label">{{ messages.SUMMARY_LABEL_NAME }}</span>
+      <span class="wts__meta-value">{{ summaryName || '-' }}</span>
+    </div>
+    @if (summaryBusinessType) {
+      <div class="wts__meta-row">
+        <span class="wts__meta-label">{{ messages.SUMMARY_LABEL_BUSINESS }}</span>
+        <span class="wts__meta-value">{{ summaryBusinessType }}</span>
+      </div>
+    }
+    @if (summaryDescription) {
+      <div class="wts__meta-row">
+        <span class="wts__meta-label">{{ messages.SUMMARY_LABEL_DESC }}</span>
+        <span class="wts__meta-value">{{ summaryDescription }}</span>
+      </div>
+    }
+  </div>
+
+  <ng-template #stepCard let-step="step" let-side="side">
+    <article
+      class="wts__step-card"
+      #stepRef
+      [attr.data-step-id]="step.id"
+      [attr.data-step-side]="side"
+    >
+      <div class="wts__step-head">
+        <div class="wts__step-title">
+          <span class="wts__step-name">{{ step.name }}</span>
+        </div>
+
+        @if (step.allowReject || step.allowForceStop) {
+          <div class="wts__step-tags">
+            @if (step.allowReject) {
+              <ex-tag variant="warning" size="small">
+                {{ messages.LABEL_ALLOW_REJECT }}
+              </ex-tag>
+            }
+            @if (step.allowForceStop) {
+              <ex-tag variant="error" size="small">
+                {{ messages.LABEL_FORCE_STOP }}
+              </ex-tag>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="wts__step-body">
+        <div class="wts__summary-block">
+          <span class="wts__summary-label">{{ messages.LABEL_DISPLAY_STATUS }}</span>
+          <strong class="wts__summary-value">{{ getStepStatus(step) }}</strong>
+        </div>
+
+        <div class="wts__summary-line">
+          <span class="wts__summary-label">{{ messages.LABEL_POLICY }}:</span>
+          <span class="wts__summary-data">{{ getPolicyLabel(step.assignmentPolicy) }}</span>
+        </div>
+
+        <div class="wts__summary-block">
+          <span class="wts__summary-label">{{ messages.LABEL_ASSIGNEES }}</span>
+
+          @if (isEditable) {
+            <div class="wts__assignee-editor">
+              @for (assignee of getVisibleAssignees(step); track $index; let i = $index) {
+                <div class="wts__assignee-row">
+                  <ex-dropdown
+                    class="wts__assignee-mode"
+                    [options]="assigneeModeOptions"
+                    [ngModel]="assignee.mode"
+                    (ngModelChange)="updateAssigneeMode(step, i, $event)"
+                  ></ex-dropdown>
+
+                  @if (assignee.mode === 'userId') {
+                    <ex-input-field
+                      class="wts__assignee-input"
+                      [ngModel]="assignee.userId"
+                      (ngModelChange)="updateAssigneeValue(step, i, 'userId', $event)"
+                      [placeholder]="messages.PLACEHOLDER_EMAIL"
+                    ></ex-input-field>
+                  } @else {
+                    <ex-dropdown
+                      class="wts__assignee-input"
+                      [options]="roles"
+                      [showSearch]="true"
+                      [ngModel]="assignee.role"
+                      (ngModelChange)="updateAssigneeValue(step, i, 'role', $event)"
+                    ></ex-dropdown>
+                  }
+
+                  <ex-icon-button
+                    class="wts__assignee-remove"
+                    name="delete"
+                    variant="ghost"
+                    [size]="16"
+                    [disabled]="getVisibleAssignees(step).length <= 1"
+                    (clicked)="removeAssignee(step, i)"
+                  ></ex-icon-button>
+                </div>
+              }
+
+              <ex-button
+                class="wts__assignee-add"
+                variant="dashed"
+                size="small"
+                icon="add"
+                [iconSize]="16"
+                (click)="addAssignee(step)"
+              >
+                {{ messages.ADD_MEMBER }}
+              </ex-button>
+            </div>
+          } @else {
+            <div class="wts__assignees-list">
+              @for (assignee of getVisibleAssignees(step); track $index; let i = $index) {
+                <div class="wts__assignee">
+                  <span class="wts__assignee-name">
+                    <span class="wts__summary-label">
+                      {{ i + 1 }}. {{ getAssigneeSummaryTypeLabel(assignee) }}:
+                    </span>
+                    <span class="wts__summary-data">{{ getAssigneeLabel(assignee) }}</span>
+                  </span>
+                </div>
+              }
+              @if (getVisibleAssignees(step).length === 0) {
+                <div class="wts__empty">No assignee configured</div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="wts__summary-line">
+          <span class="wts__summary-label">{{ messages.LABEL_APPROVE_LABEL }}:</span>
+          <span class="wts__summary-data">{{ getApproveLabel(step) }}</span>
+        </div>
+
+        @if (step.allowForceStop) {
+          <div class="wts__summary-condition">
+            <span class="wts__summary-label">{{ messages.LABEL_FORCE_STOP }}</span>
+            <span class="wts__summary-line">
+              <span class="wts__summary-label">{{ messages.LABEL_FORCE_STOP_LABEL }}:</span>
+              <span class="wts__summary-data">{{ getForceStopLabel(step) }}</span>
+            </span>
+          </div>
+        }
+
+        @if (step.allowReject) {
+          <div class="wts__summary-condition">
+            <span class="wts__summary-label">{{ messages.LABEL_ALLOW_REJECT }}</span>
+            <span class="wts__summary-line">
+              <span class="wts__summary-label">{{ messages.LABEL_REJECT_LABEL }}:</span>
+              <span class="wts__summary-data">{{ getRejectLabel(step) }}</span>
+            </span>
+            <span class="wts__summary-line">
+              <span class="wts__summary-label">{{ messages.ON_REJECT_TO_PHASE_ORDER }}:</span>
+              <span class="wts__summary-data">{{ getRejectTargetLabel(step) }}</span>
+            </span>
+          </div>
+        }
+
+        @if (step.autoCallFunction) {
+          <div class="wts__summary-block">
+            <span class="wts__summary-label wts__summary-label--strong">
+              {{ messages.LABEL_AUTO_CALL }}
+            </span>
+            <strong class="wts__summary-value">{{ step.autoCallFunction }}</strong>
+          </div>
+        }
+      </div>
+    </article>
+  </ng-template>
+
+  <div class="wts__diagram" #diagramRef>
+    <svg
+      class="wts__reject-svg"
+      [attr.width]="rejectSvgWidth"
+      [attr.height]="rejectSvgHeight"
+      [style.width.px]="rejectSvgWidth"
+      [style.height.px]="rejectSvgHeight"
+      aria-hidden="true"
+    >
+      <defs>
+        <marker
+          id="wtsRejectArrow"
+          markerWidth="10"
+          markerHeight="10"
+          refX="5"
+          refY="5"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" class="wts__reject-arrow"></path>
+        </marker>
+      </defs>
+
+      @for (path of rejectPaths; track path.id) {
+        <path
+          class="wts__reject-path"
+          [attr.d]="path.d"
+          marker-end="url(#wtsRejectArrow)"
+        ></path>
+        <text
+          class="wts__reject-label"
+          [attr.x]="path.labelX"
+          [attr.y]="path.labelY"
+          [attr.text-anchor]="path.labelAnchor"
+        >
+          {{ path.label }}
+        </text>
+      }
+    </svg>
+
+    <div class="wts__phases">
+      <section class="wts__phase wts__phase--zero" #phaseZeroRef>
+        <header class="wts__phase-header">
+          <span class="wts__phase-order">0</span>
+          <span class="wts__phase-label">จบ workflow</span>
+        </header>
+      </section>
+
+      @for (phase of displayPhases; track phase.phaseOrder; let i = $index) {
+        <section
+          class="wts__phase"
+          [class.wts__phase--parallel]="phase.isParallel"
+          [class.wts__phase--linear]="!phase.isParallel"
+          #phaseRef
+        >
+          <header class="wts__phase-header">
+            <span class="wts__phase-order">{{ phase.phaseOrder }}</span>
+            <span class="wts__phase-label">{{ phase.label }}</span>
+          </header>
+
+          @if (phase.isParallel) {
+            <div class="wts__parallel-grid">
+              <div class="wts__parallel-column">
+                @for (step of phase.leftSteps; track step.id) {
+                  <div class="wts__branch wts__branch--left">
+                    <ng-container
+                      [ngTemplateOutlet]="stepCard"
+                      [ngTemplateOutletContext]="{ step: step, side: 'left' }"
+                    ></ng-container>
+                  </div>
+                }
+              </div>
+
+              <div class="wts__parallel-column">
+                @for (step of phase.rightSteps; track step.id) {
+                  <div class="wts__branch wts__branch--right">
+                    <ng-container
+                      [ngTemplateOutlet]="stepCard"
+                      [ngTemplateOutletContext]="{ step: step, side: 'right' }"
+                    ></ng-container>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="wts__linear-body">
+              <ng-container
+                [ngTemplateOutlet]="stepCard"
+                [ngTemplateOutletContext]="{ step: phase.steps[0], side: 'linear' }"
+              ></ng-container>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  </div>
+
+  <div class="wts__footer">
+    <ex-button variant="outline" (click)="onBack()">
+      {{ messages.BUTTON_BACK }}
+    </ex-button>
+    <ex-button variant="primary" [disabled]="submitting" (click)="onSubmit()">
+      {{ submitting ? messages.BUTTON_SUBMITTING : messages.BUTTON_SUBMIT }}
+    </ex-button>
+  </div>
+</div>

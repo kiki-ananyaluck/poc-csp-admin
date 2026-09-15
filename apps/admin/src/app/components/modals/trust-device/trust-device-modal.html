@@ -1,0 +1,17 @@
+@if (trustDeviceService.isOpen()) {
+<div class="trust-device-modal">
+  <div class="modal-content">
+    <h2 class="title">{{ modalTitle }}</h2>
+    <p class="description">{{ modalSubtitle }}</p>
+  </div>
+
+  <div class="modal-actions">
+    <button class="btn-secondary" (click)="onSkip()">
+      {{modalSkipButton }}
+    </button>
+    <button class="btn-primary" (click)="onTrustDevice()">
+      {{ modalTrustDeviceButton }}
+    </button>
+  </div>
+</div>
+}

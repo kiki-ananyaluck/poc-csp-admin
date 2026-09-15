@@ -1,0 +1,11 @@
+@if (status() === 'published') {
+<span class="term-status-badge term-status-badge--published">
+  <span class="term-status-badge__dot"></span>
+  {{ publishedLabel() }}
+</span>
+} @else {
+<span class="term-status-badge term-status-badge--inactive">
+  <span class="term-status-badge__dot"></span>
+  {{ inactiveLabel() }}
+</span>
+}

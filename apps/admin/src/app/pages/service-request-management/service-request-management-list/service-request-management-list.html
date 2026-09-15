@@ -1,0 +1,37 @@
+<div class="srm-list" [attr.data-testid]="selectors.HOST">
+  <!-- Header -->
+  <div class="srm-list__header">
+    <div>
+      <h1 class="srm-list__title">{{ messages.PAGE_TITLE }}</h1>
+      <p class="srm-list__subtitle">{{ messages.PAGE_SUBTITLE }}</p>
+    </div>
+  </div>
+
+  <!-- Custom Tab Bar -->
+  <div class="srm-list__tab-bar">
+    @for (tab of visibleTabs(); track tab.key; let i = $index) {
+    <button
+      type="button"
+      class="srm-list__tab-item"
+      [class.srm-list__tab-item--active]="tabIndex() === i"
+      (click)="selectTab(i)"
+    >
+      <ex-icon [name]="tab.icon" [size]="16"></ex-icon>
+      {{ tab.label }}
+    </button>
+    }
+  </div>
+
+  <!-- Tab content -->
+  @switch (activeTabKey()) { @case ('queue') {
+  <app-srm-queue-tab [showActionControls]="canEditSrm()"></app-srm-queue-tab>
+  } @case ('my-work') {
+  <app-srm-my-work-tab></app-srm-my-work-tab>
+  } @case ('in-progress') {
+  <app-srm-in-progress-tab
+    [showActionControls]="canEditSrm()"
+  ></app-srm-in-progress-tab>
+  } @default {
+  <app-srm-all-tab></app-srm-all-tab>
+  } }
+</div>

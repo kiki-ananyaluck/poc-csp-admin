@@ -1,0 +1,14 @@
+<div class="srm-step-sidebar">
+  @for (step of steps(); track step.id) {
+  <button
+    type="button"
+    class="srm-step-sidebar__item"
+    [class.srm-step-sidebar__item--active]="selectedStep() === step.id"
+    (click)="onStepClick(step.id)"
+  >
+    <span class="srm-step-sidebar__number">{{ step.number }}</span>
+    <span class="srm-step-sidebar__label">{{ step.label }}</span>
+    <ex-icon name="chevron-right" [size]="16"></ex-icon>
+  </button>
+  }
+</div>

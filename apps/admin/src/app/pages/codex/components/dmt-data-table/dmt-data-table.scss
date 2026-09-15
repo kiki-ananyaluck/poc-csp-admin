@@ -1,0 +1,154 @@
+.dmt {
+  // ─── Table wrapper ──────────────────────────────────────────────────────────
+  // ex-table จัดการ typography/color ของ nz-table เองผ่าน ui-kit
+  // เหลือแค่ shadow + radius ที่เป็น page-level layout
+  &__table {
+    border-radius: var(--radius-md, 8px);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  // ─── Cell ellipsis (ใช้กับคอลัมน์ที่ต้อง tooltip) ────────────────────────
+  &__cell-ellipsis {
+    display: block;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  // ─── Delete action column ──────────────────────────────────────────────────
+  // override CSS variables ของ icon-btn ในขอบเขตนี้โดยไม่ต้องใช้ ::ng-deep
+  &__col-delete {
+    --color-neutral-700: var(--color-error-default, #ff4d4f);
+    --color-primary-secondary: rgba(255, 77, 79, 0.08);
+  }
+
+  // ─── Selection bar ────────────────────────────────────────────────────────
+  &__selection-bar-wrap {
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+    pointer-events: none;
+  }
+
+  &__selection-bar {
+    pointer-events: all;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 8px 8px 8px 16px;
+    background: var(--color-neutral-0, #ffffff);
+    border: 1px solid var(--color-neutral-200, #d9d9d9);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+
+    // btn-text ใช้ var(--color-exim-blue) สำหรับสีข้อความ — override เป็นสีแดงในขอบเขตนี้
+    --color-exim-blue: var(--color-error-default, #ff4d4f);
+  }
+
+  &__selection-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 20px;
+  }
+
+  &__selection-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--color-primary-secondary, #ddeaf9);
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    font-weight: var(--font-weights-bold, 700);
+    color: var(--color-primary-default, #034ea1);
+  }
+
+  &__selection-label {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    color: var(--color-neutral-700, #2e2e2e);
+  }
+
+  &__selection-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--color-neutral-200, #d9d9d9);
+    margin: 0 var(--space-4, 16px);
+    flex-shrink: 0;
+  }
+
+  // ─── Delete confirmation modal content ────────────────────────────────────
+  &__delete-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-4, 16px) 0;
+    gap: var(--space-2, 8px);
+
+    &-title {
+      font-family: var(--font-families-base, 'Anuphan', sans-serif);
+      font-size: var(--font-sizes-h3, 20px);
+      font-weight: var(--font-weights-bold, 700);
+      color: var(--color-neutral-900, #000000);
+      margin: var(--space-2, 8px) 0 0;
+    }
+
+    &-desc {
+      font-family: var(--font-families-base, 'Anuphan', sans-serif);
+      font-size: var(--font-sizes-body-md, 14px);
+      color: var(--color-neutral-500, #565656);
+      margin: 0;
+    }
+  }
+
+  // ─── Toast positioning ────────────────────────────────────────────────────
+  &__toast-wrap {
+    position: sticky;
+    bottom: 80px;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+
+    ex-toast {
+      pointer-events: all;
+    }
+  }
+
+  &__toast-message {
+    margin: 0;
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    font-weight: var(--font-weights-medium, 500);
+  }
+
+  &__bulk-delete-btn {
+    // Override button text variant colors for error state using CSS variables from ui-kit
+    // Instead of ::ng-deep, use CSS custom properties at component level
+    &:hover:not(:disabled) {
+      background-color: var(--color-background-error, #ffe8e8);
+    }
+    &:active:not(:disabled) {
+      background-color: var(--color-error-subtle, #ffd7d7);
+    }
+  }
+
+  // ─── Actions column (edit + delete side by side) ────────────────────────────
+  &__col-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+  }
+}

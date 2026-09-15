@@ -1,0 +1,14 @@
+<div class="stepper">
+  @for (step of steps; track step.stepOrder; let i = $index; let last = $last) {
+    <div class="stepper__item" [ngClass]="'stepper__item--' + step.status.toLowerCase()">
+      <div class="stepper__circle">{{ step.stepOrder }}</div>
+      <div class="stepper__info">
+        <span class="stepper__name">{{ step.stepName }}</span>
+        <span class="stepper__status">{{ step.status }}</span>
+      </div>
+      @if (!last) {
+        <div class="stepper__connector"></div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,100 @@
+<div class="term-operators" [attr.data-testid]="selectors.HOST">
+  <ex-spinning [spinning]="state.isLoading()">
+    @if (state.info(); as info) {
+    <!-- Breadcrumb -->
+    <app-term-breadcrumb
+      [items]="breadcrumbItems"
+      [testId]="selectors.BREADCRUMB"
+    ></app-term-breadcrumb>
+
+    <!-- Header -->
+    <div class="term-operators__header">
+      <h1 class="term-operators__title">
+        {{ messages.TITLE_PREFIX }} "{{ info.termName }}" &bull; {{ info.version
+        }}
+      </h1>
+      <ex-button
+        variant="outline"
+        size="small"
+        icon="export"
+        [attr.data-testid]="selectors.BTN_EXPORT"
+      >
+        {{ messages.BTN_EXPORT }}
+      </ex-button>
+    </div>
+
+    <!-- Summary Card -->
+    <div
+      class="term-operators__summary-card"
+      [attr.data-testid]="selectors.SUMMARY_CARD"
+    >
+      <div class="term-operators__summary-item">
+        <span class="term-operators__summary-label"
+          >{{ messages.SUMMARY_LABEL }}</span
+        >
+        <span class="term-operators__summary-value">
+          {{ info.totalCount.toLocaleString() }} {{ messages.SUMMARY_UNIT }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <ex-search-input
+      [placeholder]="messages.SEARCH_PLACEHOLDER"
+      [attr.data-testid]="selectors.SEARCH_INPUT"
+      (valueChange)="state.setSearch($event)"
+    ></ex-search-input>
+
+    <!-- Table -->
+    <div #tableWrapper>
+      <ex-table
+        [data]="$any(state.filteredOperators())"
+        [total]="state.totalCount()"
+        [showCustomPagination]="false"
+        [pageIndex]="state.page()"
+        [attr.data-testid]="selectors.TABLE"
+        (columnSortChange)="onColumnSort($event)"
+      >
+        <ex-column key="index" [title]="messages.COL_INDEX"></ex-column>
+        <ex-column
+          key="name"
+          [title]="messages.COL_OPERATOR"
+          [sort]="{ show: true, fn: true }"
+        >
+          <ng-template exCell let-value let-row="row">
+            <div class="term-operators__operator-cell">
+              <span>{{ value }}</span>
+            </div>
+          </ng-template>
+        </ex-column>
+        <ex-column
+          key="email"
+          [title]="messages.COL_EMAIL"
+          [sort]="{ show: true, fn: true }"
+        ></ex-column>
+        <ex-column
+          key="acceptance"
+          [title]="messages.COL_ACCEPTANCE"
+          [sort]="{ show: true, fn: true }"
+        >
+          <ng-template exCell let-value>
+            @if (value === 'accepted') {
+            <ex-tag variant="success" icon="done_round"
+              >{{ messages.ACCEPTANCE_ACCEPTED }}</ex-tag
+            >
+            }
+          </ng-template>
+        </ex-column>
+        <ex-column
+          key="acceptedAt"
+          [title]="messages.COL_ACCEPTED_AT"
+          [sort]="{ show: true, fn: true }"
+        ></ex-column>
+      </ex-table>
+    </div>
+
+    } @else if (!state.isLoading()) {
+    <div class="term-operators__not-found">{{ messages.NOT_FOUND }}</div>
+    }
+  </ex-spinning>
+</div>

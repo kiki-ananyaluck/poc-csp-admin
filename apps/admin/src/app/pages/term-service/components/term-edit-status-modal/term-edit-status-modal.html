@@ -1,0 +1,20 @@
+<ex-modal
+  [isOpen]="isOpen"
+  [leftButton]="cancelButton"
+  [rightButton]="saveButton"
+  (closed)="closed.emit()"
+>
+  @if (modal) {
+  <div class="edit-status-modal__header">
+    <h3 class="edit-status-modal__title">{{ title }}</h3>
+    <p class="edit-status-modal__subtitle">
+      {{ modal.code }} &middot; {{ modal.version }}
+    </p>
+  </div>
+  <ex-radio-box
+    [options]="options"
+    [ngModel]="modal.selectedStatus"
+    (selectionChange)="selectionChange.emit($event)"
+  ></ex-radio-box>
+  }
+</ex-modal>

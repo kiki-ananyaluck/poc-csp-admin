@@ -1,0 +1,160 @@
+<!-- Audit Masterdata Modal -->
+<nz-modal
+  [nzVisible]="isOpen"
+  [nzTitle]="titleTpl"
+  [nzFooter]="footerTpl"
+  [nzMaskClosable]="false"
+  [nzClosable]="false"
+  [nzCentered]="true"
+  [nzWidth]="960"
+  nzClassName="amd-modal"
+>
+  <ng-container *nzModalContent>
+    <!-- Error banner -->
+    @if (hasErrors) {
+    <ex-form-alert
+      variant="error"
+      [title]="messages.ERROR_BANNER"
+    ></ex-form-alert>
+    }
+
+    <!-- Review table -->
+    <table class="amd-modal__table">
+      <thead>
+        <tr>
+          <th class="amd-modal__th amd-modal__th--row">
+            {{ messages.COL_ROW }}
+          </th>
+          <th class="amd-modal__th">{{ messages.COL_CODE }}</th>
+          <th class="amd-modal__th">{{ messages.COL_NAME_TH }}</th>
+          <th class="amd-modal__th">{{ messages.COL_NAME_EN }}</th>
+          <th class="amd-modal__th">{{ messages.COL_STATUS }}</th>
+          <th class="amd-modal__th">{{ messages.COL_REMARK }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of pagedRows; track row.no) {
+        <tr [class.amd-modal__tr--error]="row.hasError">
+          <td class="amd-modal__td" [class.amd-modal__td--error]="row.hasError">
+            {{ row.no }}
+          </td>
+          <td class="amd-modal__td">{{ row.code }}</td>
+          <td class="amd-modal__td">{{ row.nameTh }}</td>
+          <td class="amd-modal__td">{{ row.nameEn }}</td>
+          <td class="amd-modal__td">
+            <span
+              class="amd-modal__status-tag"
+              [class.amd-modal__status-tag--active]="row.status === 'active'"
+              [class.amd-modal__status-tag--inactive]="row.status === 'inactive'"
+            >
+              <span class="amd-modal__status-dot"></span>
+              {{ row.status === 'active' ? messages.STATUS_ACTIVE :
+              messages.STATUS_INACTIVE }}
+            </span>
+          </td>
+          <td class="amd-modal__td" [class.amd-modal__td--error]="row.remark">
+            {{ row.remark }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Custom pagination -->
+    <div class="amd-modal__pagination">
+      <div class="amd-modal__pagination-left">
+        <span class="amd-modal__pagination-label"
+          >{{ messages.PAGINATION_PER_PAGE }}</span
+        >
+        <div class="amd-modal__pagination-size-wrap">
+          <select
+            class="amd-modal__pagination-size"
+            [ngModel]="pageSize()"
+            (ngModelChange)="onPageSizeChange($event)"
+          >
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+          </select>
+          <span class="amd-modal__pagination-size-caret">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path
+                d="M1 1l4 4 4-4"
+                stroke="#595959"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+        </div>
+      </div>
+      <div class="amd-modal__pagination-right">
+        <span class="amd-modal__pagination-range">
+          {{ messages.PAGINATION_RANGE(rangeStart, rangeEnd, rows.length) }}
+        </span>
+        <div class="amd-modal__pagination-nav">
+          <button
+            class="amd-modal__pagination-btn"
+            [disabled]="pageIndex() <= 1"
+            (click)="onPageChange(pageIndex() - 1)"
+            aria-label="Previous page"
+          >
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+              <path
+                d="M5 1L1 5l4 4"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          @for (page of pageNumbers; track page) {
+          <button
+            class="amd-modal__pagination-btn amd-modal__pagination-page"
+            [class.amd-modal__pagination-page--active]="page === pageIndex()"
+            (click)="onPageChange(page)"
+          >
+            {{ page }}
+          </button>
+          }
+          <button
+            class="amd-modal__pagination-btn"
+            [disabled]="pageIndex() >= totalPages"
+            (click)="onPageChange(pageIndex() + 1)"
+            aria-label="Next page"
+          >
+            <svg width="6" height="10" viewBox="0 0 6 10" fill="none">
+              <path
+                d="M1 1l4 4-4 4"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</nz-modal>
+
+<ng-template #titleTpl>
+  <div class="amd-header">
+    <span class="amd-header__title">{{ messages.TITLE }}</span>
+    <button class="amd-header__reimport-btn" (click)="onReimport()">
+      <ex-icon name="amd-reimport" [size]="20"></ex-icon>
+      {{ messages.REIMPORT_BUTTON }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #footerTpl>
+  <div class="amd-footer">
+    <button class="amd-footer__cancel-btn" (click)="onCancel()">
+      {{ messages.CANCEL_BUTTON }}
+    </button>
+  </div>
+</ng-template>

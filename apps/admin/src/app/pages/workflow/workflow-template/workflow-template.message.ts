@@ -1,0 +1,78 @@
+export const WORKFLOW_TEMPLATE_MESSAGES = {
+  PAGE_TITLE: 'สร้างแม่แบบ',
+  SUBTITLE: 'กำหนดแม่แบบ สำหรับกระบวนการอนุมัติอัตโนมัติ',
+
+  // Metadata Form
+  LABEL_TEMPLATE_CODE: 'รหัสแม่แบบ',
+  LABEL_TEMPLATE_NAME: 'ชื่อแม่แบบ',
+  LABEL_DESCRIPTION: 'คำอธิบาย',
+  LABEL_BUSINESS_TYPES: 'ประเภทธุรกิจ',
+  PLACEHOLDER_TEMPLATE_CODE: 'e.g. T001',
+  PLACEHOLDER_TEMPLATE_NAME: 'e.g. งานรับประกัน (รายใหม่)',
+  PLACEHOLDER_DESCRIPTION: 'รายละเอียดเพิ่มเติม (ไม่บังคับ)',
+  PLACEHOLDER_BUSINESS_TYPES: 'e.g. ต่ออายุ',
+
+  //Step Builder
+  TRIGGER_LABEL: 'เริ่ม workflow',
+  ADD_STEP: 'เพิ่มขั้นตอนแบบ Linear',
+  ADD_PARALLEL: 'เพิ่มขั้นตอนแบบ Parallel',
+  ADD_BRANCH: 'เพิ่มขั้นตอน',
+  CLOSE_NODE: 'ปิดการขยาย step ก่อนหน้า',
+  OPEN_EDITOR:'เปิดเพื่อแก้ไขรายละเอียด',
+
+  //stpe nodes
+  IN_NODE_DELETE_BUTTON: 'ลบ',
+  IN_NODE_ADD_PARALLEL_STEP_BUTTON: 'เพิ่มขั้นตอน',
+
+  // Step Editor
+  LABEL_STEP_NAME: 'ชื่อขั้นตอน',
+  LABEL_DISPLAY_STATUS: 'ข้อความแสดงสถานะของขั้นตอน',
+  LABEL_PHASE_NAME: 'ชื่อ Phase',
+  LABEL_POLICY: 'นโยบาย',
+  LABEL_ASSIGNEES: 'ผู้รับมอบหมาย',
+  LABEL_ALLOW_REJECT: 'อนุญาตให้ปฏิเสธ',
+  LABEL_FORCE_STOP: 'อนุญาตให้บังคับหยุด',
+  LABEL_AUTO_CALL: 'Auto Call Function (API Webhook)',
+  LABEL_APPROVE_LABEL: 'ป้ายกำกับปุ่มอนุมัติ',
+  LABEL_REJECT_LABEL: 'ป้ายกำกับปุ่มปฏิเสธ',
+  LABEL_FORCE_STOP_LABEL: 'ป้ายกำกับปุ่มบังคับหยุด',
+  PLACEHOLDER_STEP_NAME: 'e.g. ตรวจสอบเอกสาร',
+  PLACEHOLDER_DISPLAY_STATUS: 'ถ้าไม่กรอกจะใช้ชื่อขั้นตอน',
+  PLACEHOLDER_AUTO_CALL: 'e.g. /api/v1/WebHook/create-job',
+  PLACEHOLDER_APPROVE_LABEL: 'อนุมัติ',
+  PLACEHOLDER_REJECT_LABEL: 'ปฏิเสธ',
+  PLACEHOLDER_FORCE_STOP_LABEL: 'บังคับจบกระบวนการ',
+  ADD_MEMBER: 'เพิ่มสมาชิก',
+  ASSIGNEE_TYPE_USER: 'User ID',
+  ASSIGNEE_TYPE_ROLE: 'Role',
+  PLACEHOLDER_EMAIL: 'Email / ID',
+  PLACEHOLDER_ROLE: 'Role name',
+  ON_REJECT_TO_PHASE_ORDER: 'เมื่อปฏิเสธให้ย้อนกลับไปที่ขั้นตอนที่',
+
+  // Actions
+  BUTTON_SUMMARY: 'ไปยังสรุป',
+  BUTTON_SUBMIT: 'สร้างแม่แบบ',
+  BUTTON_SUBMITTING: 'กำลังสร้าง...',
+  BUTTON_NEXT: 'ถัดไป',
+  BUTTON_BACK: 'ย้อนกลับ',
+  SUMMARY_TITLE: 'สรุปแม่แบบ',
+  SUMMARY_SUBTITLE: 'ตรวจสอบรายละเอียดแม่แบบก่อนสร้าง',
+  SUMMARY_LABEL_CODE: 'รหัส',
+  SUMMARY_LABEL_NAME: 'ชื่อแม่แบบ',
+  SUMMARY_LABEL_BUSINESS: 'ประเภทธุรกิจ',
+  SUMMARY_LABEL_DESC: 'คำอธิบาย',
+  SUMMARY_POLICY_ALL: 'ALL',
+  SUMMARY_POLICY_ANY: 'ANY',
+  SUMMARY_REJECT_TO: 'REJECT TO #',
+  SUMMARY_LABEL_PARALLEL: 'Parallel',
+
+  // Feedback
+  TOAST_SUCCESS: 'สร้างแม่แบบสำเร็จ',
+  TOAST_ERROR: 'เกิดข้อผิดพลาด กรุณาลองใหม่',
+  ERROR_REQUIRED_CODE: 'กรุณากรอกรหัสแม่แบบ',
+  ERROR_REQUIRED_NAME: 'กรุณากรอกชื่อแม่แบบ',
+  ERROR_NO_STEPS: 'กรุณาเพิ่มอย่างน้อย 1 ขั้นตอน',
+  ERROR_REQUIRED_BUSINESS_TYPE: 'โปรดระบุประเภทธุรกิจ',
+  ERROR_REQUIRED_STEP_NAME: 'โปรดระบุชื่อขั้นตอนในทุกขั้นตอน',
+  ERROR_REQUIRED_ASSIGNEE: 'โปรดเพิ่มผู้รับมอบหมายอย่างน้อย 1 คนในทุกขั้นตอน',
+};

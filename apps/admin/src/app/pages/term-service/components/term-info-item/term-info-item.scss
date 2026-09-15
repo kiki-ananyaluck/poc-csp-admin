@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex: 1;
+  border-right: 1px solid var(--semantic-color-neutral-100, #e0e0e0);
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.term-info-item {
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__label {
+    font-size: var(--size-body-xs, 12px);
+    color: var(--semantic-color-neutral-400, #8c8c8c);
+  }
+}

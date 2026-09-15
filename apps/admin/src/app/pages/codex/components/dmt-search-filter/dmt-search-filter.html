@@ -1,0 +1,93 @@
+<!-- Search & Filter row -->
+<div class="dmt__search-row">
+  <ex-search-input
+    class="dmt__search-input"
+    [placeholder]="messages.SEARCH_PLACEHOLDER"
+    (valueChange)="onSearchInput($event)"
+  ></ex-search-input>
+
+  <div class="dmt__filter-wrap">
+    <ex-button
+      variant="neutral"
+      size="small"
+      icon="filter"
+      [iconSize]="16"
+      (click)="toggleFilterPanel()"
+      >{{ messages.FILTER_BUTTON }}</ex-button
+    >
+
+    @if (isFilterPanelOpen()) {
+    <div class="dmt__filter-panel">
+      <div class="dmt__filter-panel-header">
+        <span class="dmt__filter-panel-title"
+          >{{ messages.FILTER_PANEL_TITLE }}</span
+        >
+        <ex-button variant="text" size="small" (click)="onFilterClear()"
+          >{{ messages.FILTER_CLEAR }}</ex-button
+        >
+      </div>
+      <hr class="dmt__filter-divider" />
+      <div class="dmt__filter-section">
+        <p class="dmt__filter-section-label">
+          {{ messages.FILTER_STATUS_LABEL }}
+        </p>
+        <ex-checkbox
+          [checked]="pendingStatusActive()"
+          (checkedChange)="pendingStatusActive.set($event)"
+          >{{ messages.STATUS_ACTIVE }}</ex-checkbox
+        >
+        <ex-checkbox
+          [checked]="pendingStatusInactive()"
+          (checkedChange)="pendingStatusInactive.set($event)"
+          >{{ messages.STATUS_INACTIVE }}</ex-checkbox
+        >
+      </div>
+      <hr class="dmt__filter-divider" />
+      <div class="dmt__filter-panel-footer">
+        <ex-button variant="outline" size="small" (click)="onFilterCancel()"
+          >{{ messages.FILTER_CANCEL }}</ex-button
+        >
+        <ex-button variant="primary" size="small" (click)="onFilterApply()"
+          >{{ messages.FILTER_APPLY }}</ex-button
+        >
+      </div>
+    </div>
+    }
+  </div>
+</div>
+
+<!-- Filter chips + Total row -->
+<div class="dmt__filter-total-row">
+  <div class="dmt__active-filter-row">
+    <span class="dmt__active-filter-label">{{ messages.FILTER_BY_LABEL }}</span>
+    @if (appliedStatusActive) {
+    <span class="dmt__active-filter-chip">
+      {{ messages.FILTER_STATUS_LABEL }}: {{ messages.STATUS_ACTIVE }}
+      <button
+        type="button"
+        class="dmt__active-filter-chip-close"
+        (click)="removeActiveChip.emit('active')"
+        aria-label="Remove"
+      >
+        ×
+      </button>
+    </span>
+    } @if (appliedStatusInactive) {
+    <span class="dmt__active-filter-chip">
+      {{ messages.FILTER_STATUS_LABEL }}: {{ messages.STATUS_INACTIVE }}
+      <button
+        type="button"
+        class="dmt__active-filter-chip-close"
+        (click)="removeActiveChip.emit('inactive')"
+        aria-label="Remove"
+      >
+        ×
+      </button>
+    </span>
+    }
+  </div>
+  <div class="dmt__total">
+    {{ messages.TOTAL_LABEL }}: <strong>{{ filteredTotal }}</strong> {{
+    messages.TOTAL_UNIT }}
+  </div>
+</div>

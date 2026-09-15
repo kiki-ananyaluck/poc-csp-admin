@@ -1,0 +1,24 @@
+<ex-modal-input
+  [isOpen]="state.isOpen()"
+  [title]="messages.MODAL_BULK_TITLE"
+  width="520px"
+  [showTopDivider]="true"
+  [showCloseButton]="true"
+  [closeOnBackdrop]="false"
+  [leftButton]="cancelButton"
+  [rightButton]="confirmButton"
+  (closed)="state.close()"
+>
+  <div class="bulk-desc-modal__body">
+    <textarea
+      class="bulk-desc-modal__textarea"
+      [placeholder]="messages.MODAL_BULK_DESCRIPTION_PLACEHOLDER"
+      [value]="state.description()"
+      (input)="state.description.set($any($event.target).value)"
+      rows="4"
+    ></textarea>
+    <span class="bulk-desc-modal__hint">
+      {{ messages.MODAL_BULK_DESCRIPTION_HINT }}
+    </span>
+  </div>
+</ex-modal-input>

@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+.term-info-card {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--semantic-color-neutral-100, #e0e0e0);
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 16px;
+  overflow: hidden;
+}

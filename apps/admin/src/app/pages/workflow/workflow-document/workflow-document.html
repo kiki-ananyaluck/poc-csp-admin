@@ -1,0 +1,242 @@
+<div class="workflow-doc" [attr.data-testid]="selectors.CONTAINER">
+  <!-- Header -->
+  <div class="workflow-doc__header" [attr.data-testid]="selectors.HEADER">
+    <div class="workflow-doc__header-left">
+      <h2 class="workflow-doc__title" [attr.data-testid]="selectors.TITLE">{{ messages.PAGE_TITLE }}</h2>
+    </div>
+    @if (state.instance()) {
+      <div class="workflow-doc__header-info">
+        <span class="workflow-doc__doc-id" [attr.data-testid]="selectors.DOC_ID">{{ messages.DOC_ID_PREFIX }} {{ state.instance()!.documentId }}</span>
+        <span class="workflow-doc__biz-type" [attr.data-testid]="selectors.BIZ_TYPE">{{ state.instance()!.businessType }}</span>
+        <app-status-badge [status]="state.instance()!.status"></app-status-badge>
+      </div>
+    }
+  </div>
+
+  <!-- Search -->
+  <div class="workflow-doc__search">
+    <input
+      class="workflow-doc__search-input"
+      [attr.data-testid]="selectors.SEARCH_INPUT"
+      type="text"
+      [placeholder]="messages.SEARCH_PLACEHOLDER"
+      [ngModel]="state.searchDocumentId()"
+      (ngModelChange)="state.searchDocumentId.set($event)"
+      (keydown.enter)="onSearch()"
+    />
+    <ex-button
+      [attr.data-testid]="selectors.BUTTON_SEARCH"
+      variant="primary"
+      size="small"
+      [disabled]="state.loading()"
+      (click)="onSearch()"
+    >
+      {{ messages.BUTTON_SEARCH }}
+    </ex-button>
+  </div>
+
+  @if (state.loading()) {
+    <div class="workflow-doc__loading" [attr.data-testid]="selectors.LOADING">
+      <span>{{ messages.LOADING }}</span>
+    </div>
+  }
+
+  @if (state.instance() && !state.loading()) {
+    <!-- Step Stepper -->
+    <div class="workflow-doc__section" [attr.data-testid]="selectors.SECTION_ALL_STEPS">
+      <h3 class="workflow-doc__section-title">{{ messages.SECTION_ALL_STEPS }}</h3>
+      <app-workflow-stepper [steps]="stepsForStepper"></app-workflow-stepper>
+    </div>
+
+    <!-- All Steps Detail -->
+    <div class="workflow-doc__section">
+      <h3 class="workflow-doc__section-title">{{ messages.SECTION_STEP_DETAILS }}</h3>
+      @for (stepData of currentPhaseAsArray; track stepData.stepInstanceId) {
+        <div class="workflow-doc__step-card">
+          <div class="workflow-doc__step-card-header">
+            <span class="workflow-doc__step-name">{{ messages.STEP_ORDER_PREFIX }}{{ stepData.phaseOrder }} — {{ stepData.stepName }}</span>
+            <app-assignment-policy-badge [policy]="stepData.assignmentPolicy"></app-assignment-policy-badge>
+            <app-status-badge [status]="stepData.status"></app-status-badge>
+            <span class="workflow-doc__step-progress">
+              {{ messages.PROGRESS_APPROVED }} {{ stepData.approvedCount }} / {{ stepData.totalAssignees }}
+            </span>
+          </div>
+          <div class="workflow-doc__assignees">
+            <table class="workflow-doc__assignee-table">
+              <thead>
+                <tr>
+                  <th>{{ messages.TABLE_COL_ASSIGNEE }}</th>
+                  <th>{{ messages.TABLE_COL_ROLE }}</th>
+                  <th>{{ messages.TABLE_COL_STATUS }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (assignee of stepData.assignees; track assignee.actionId) {
+                  <tr>
+                    <td>{{ assignee.userId }}</td>
+                    <td>{{ assignee.role }}</td>
+                    <td>
+                      <app-status-badge [status]="assignee.actionType"></app-status-badge>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- History Log -->
+    <!-- <div class="workflow-doc__section">
+      <h3 class="workflow-doc__section-title">ประวัติการดำเนินการ</h3>
+      @if (logs.length > 0) {
+        <table class="workflow-doc__history-table">
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>Step</th>
+              <th>Action</th>
+              <th>ผู้ดำเนินการ</th>
+              <th>Role</th>
+              <th>หมายเหตุ</th>
+              <th>เวลา</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (log of logs; track $index) {
+              <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ log }}</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="workflow-doc__empty">ยังไม่มีประวัติ</p>
+      }
+    </div> -->
+    
+  } 
+
+  @if (state.notFound() && !state.loading()) {
+    <div class="workflow-doc__not-found" [attr.data-testid]="selectors.NOT_FOUND">
+      <p>{{ messages.NOT_FOUND }}</p>
+    </div>
+  }
+
+  @if (state.errorMessage()) {
+    <div class="workflow-doc__error" [attr.data-testid]="selectors.ERROR">{{ state.errorMessage() }}</div>
+  }
+
+  <!-- Confirm Modal (Approve / Force Stop) -->
+  <ex-modal
+    [attr.data-testid]="selectors.MODAL_CONFIRM"
+    [isOpen]="state.isConfirmModalOpen()"
+    [title]="state.confirmModalTitle()"
+    [leftButton]="confirmLeftButton"
+    [rightButton]="confirmRightButton"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    (close)="state.isConfirmModalOpen.set(false)"
+  >
+    <div class="workflow-doc__modal-body">
+      <p>{{ state.confirmModalMessage() }}</p>
+      @if (state.confirmRequiresRemark()) {
+        <div class="workflow-doc__modal-field">
+          <label for="workflow-document-confirm-remark">{{ messages.MODAL_REMARK_LABEL }} <span class="required">*</span></label>
+          <textarea
+            id="workflow-document-confirm-remark"
+            [ngModel]="state.actionRemark()"
+            (ngModelChange)="state.actionRemark.set($event)"
+            rows="3"
+            [placeholder]="messages.MODAL_REMARK_PLACEHOLDER"
+          ></textarea>
+        </div>
+      }
+    </div>
+  </ex-modal>
+
+  <!-- Remark Modal (Reject) -->
+  <ex-modal
+    [attr.data-testid]="selectors.MODAL_REMARK"
+    [isOpen]="state.isRemarkModalOpen()"
+    [title]="messages.MODAL_REJECT_TITLE"
+    [leftButton]="remarkLeftButton"
+    [rightButton]="remarkRightButton"
+    [rightButtonDisabled]="!state.actionRemark().trim()"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    (close)="state.isRemarkModalOpen.set(false)"
+  >
+    <div class="workflow-doc__modal-body">
+      <div class="workflow-doc__modal-field">
+        <label for="workflow-document-reject-remark">{{ messages.MODAL_REJECT_REASON_LABEL }} <span class="required">*</span></label>
+        <textarea
+          id="workflow-document-reject-remark"
+          [ngModel]="state.actionRemark()"
+          (ngModelChange)="state.actionRemark.set($event)"
+          rows="3"
+          [placeholder]="messages.MODAL_REJECT_PLACEHOLDER"
+        ></textarea>
+      </div>
+    </div>
+  </ex-modal>
+
+  <!-- Assignee Edit Modal -->
+  <ex-modal
+    [attr.data-testid]="selectors.MODAL_EDIT_ASSIGNEE"
+    [isOpen]="state.isAssigneeEditModalOpen()"
+    [title]="messages.MODAL_EDIT_ASSIGNEE_TITLE"
+    [leftButton]="assigneeLeftButton"
+    [rightButton]="assigneeRightButton"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    (close)="state.isAssigneeEditModalOpen.set(false)"
+  >
+    <div class="workflow-doc__modal-body">
+      @for (assignee of state.editingAssignees(); track $index) {
+        <div class="workflow-doc__assignee-edit-row">
+          <div class="workflow-doc__modal-field">
+            <label [attr.for]="'workflow-document-assignee-user-' + $index">{{ messages.MODAL_USER_ID_LABEL }}</label>
+            <input
+              [id]="'workflow-document-assignee-user-' + $index"
+              type="text"
+              [(ngModel)]="assignee.userId"
+              placeholder="User ID"
+            />
+          </div>
+          <div class="workflow-doc__modal-field">
+            <label [attr.for]="'workflow-document-assignee-role-' + $index">{{ messages.MODAL_ROLE_LABEL }}</label>
+            <input
+              [id]="'workflow-document-assignee-role-' + $index"
+              type="text"
+              [(ngModel)]="assignee.role"
+              placeholder="Role"
+            />
+          </div>
+          <ex-button variant="text" size="small" (click)="removeEditingAssignee($index)">✕</ex-button>
+        </div>
+      }
+      <ex-button variant="text" size="small" (click)="addEditingAssignee()">{{ messages.MODAL_ADD_ASSIGNEE }}</ex-button>
+    </div>
+  </ex-modal>
+</div>
+
+@if (state.showSuccessToast()) {
+  <div class="workflow-doc__toast-wrap">
+    <ex-toast
+      [attr.data-testid]="selectors.TOAST_SUCCESS"
+      variant="success"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showCloseButton]="true"
+      (dismiss)="state.showSuccessToast.set(false)"
+    >{{ state.toastMessage() }}</ex-toast>
+  </div>
+}

@@ -1,0 +1,9 @@
+# Azure Artifacts registry for @exim packages
+@exim:registry=https://pkgs.dev.azure.com/abc/_packaging/abc/npm/registry/
+always-auth=true
+
+# Use public npm registry for all other packages
+registry=https://registry.npmjs.org/
+
+# Azure Artifacts Authentication
+//pkgs.dev.azure.com/abc/_packaging/abc/npm/registry/:_authToken=PERSONAL_ACCESS_TOKEN

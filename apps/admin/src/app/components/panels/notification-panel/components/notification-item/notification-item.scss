@@ -1,0 +1,97 @@
+:host {
+  display: block;
+}
+
+.noti-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  // height: 96px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+  position: relative;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: var(--semantic-color-neutral-50, #d9d9d9);
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    line-height: 0;
+
+    ex-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &__icon-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18.33px;
+    height: 17.43px;
+    border-radius: 6px;
+    background-color: var(--semantic-color-error-default, #e39696);
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    padding-right: 16px;
+  }
+
+  &__title {
+    font-family: var(--font-families-base);
+    font-size: var(--size-body-sm, 14px);
+    font-weight: var(--font-weights-semibold, 600);
+    line-height: 1.4;
+    color: var(--semantic-color-neutral-700, #2e2e2e);
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__subtitle {
+    font-family: var(--font-families-base);
+    font-size: var(--size-caption, 12px);
+    font-weight: var(--font-weights-regular, 400);
+    line-height: 1.4;
+    color: var(--semantic-color-neutral-500, #565656);
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__time {
+    font-family: var(--font-families-base);
+    font-size: var(--size-caption, 12px);
+    font-weight: var(--font-weights-regular, 400);
+    line-height: 3;
+    color: var(--semantic-color-neutral-400, #8c8c8c);
+    margin: 0;
+  }
+
+  &__dot {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--semantic-color-error-default, #a81a1a);
+    flex-shrink: 0;
+  }
+}

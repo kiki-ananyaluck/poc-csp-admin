@@ -1,0 +1,50 @@
+<!-- Bell icon with badge -->
+<div
+  class="navbar-main__bell-wrapper"
+  (click)="state.toggleNotificationPanel()"
+  (keydown.enter)="state.toggleNotificationPanel()"
+  tabindex="0"
+  role="button"
+  aria-label="การแจ้งเตือน"
+>
+  <ex-icon [name]="'bell'" class="navbar-main__bell"></ex-icon>
+  @if (state.unreadCount() > 0) {
+    <span class="navbar-main__badge">
+      {{ state.unreadCount() > 99 ? '99+' : state.unreadCount() }}
+    </span>
+  }
+</div>
+
+<!-- User profile box (right) -->
+<div class="user-profile-box">
+  <div class="user-profile-box__info">
+    <span class="user-profile-box__label">{{ messages.USER_LABEL }}</span>
+    <span class="user-profile-box__name">{{ state.userName() }}</span>
+  </div>
+  <div
+    class="user-profile-box__avatar"
+    (click)="state.togglePanel()"
+    (keydown.enter)="state.togglePanel()"
+    tabindex="0"
+  >
+    <ex-user-avatar
+      [size]="avatarSize"
+      [name]="state.userName()"
+      [imageUrl]="state.avatarUrl()"
+    ></ex-user-avatar>
+  </div>
+</div>
+
+@if (state.isPanelOpen()) {
+<div class="navbar-main__panel">
+  <app-user-profile-panel
+    (closed)="state.closePanel()"
+  ></app-user-profile-panel>
+</div>
+}
+
+<!-- Notification Drawer Panel -->
+<app-notification-panel
+  [isOpen]="state.isNotificationPanelOpen()"
+  (closed)="state.closeNotificationPanel()"
+></app-notification-panel>

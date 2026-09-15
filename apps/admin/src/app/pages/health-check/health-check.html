@@ -1,0 +1,54 @@
+<div class="health-check">
+  <div class="health-check__header">
+    <h1 class="health-check__title">{{ messages.TITLE }}</h1>
+    <p class="health-check__subtitle">{{ messages.SUBTITLE }}</p>
+  </div>
+
+  <div class="health-check__cards">
+    @for (content of state.bannerData()?.contents ?? []; track content.tag; let
+    i = $index) { @let header = getCardHeader(content); @let features =
+    getCardFeatures(content);
+
+    <div class="health-check__card">
+      @if (header) {
+      <div class="health-check__card-top">
+        <div class="health-check__card-icon health-check__card-icon">
+          <img
+            [src]="header.imageUrl"
+            [alt]="header.title"
+            class="health-check__card-img"
+          />
+        </div>
+        <div class="health-check__card-info">
+          <h2 class="health-check__card-title">{{ header.title }}</h2>
+          <p class="health-check__card-desc">{{ header.subtitle }}</p>
+        </div>
+      </div>
+      } @for (feature of features; track feature.id) {
+      <div class="health-check__card-feature">
+        <div class="health-check__feature-icon">
+          <img
+            [src]="feature.imageUrl"
+            [alt]="feature.title"
+            class="health-check__feature-img"
+          />
+        </div>
+        <div class="health-check__feature-info">
+          <p class="health-check__feature-title">{{ feature.title }}</p>
+          <p class="health-check__feature-desc">{{ feature.subtitle }}</p>
+        </div>
+      </div>
+      <ex-button
+        icon="new-window"
+        variant="default"
+        size="small"
+        [width]="'100%'"
+        (click)="navigateTo(feature.buttonLink)"
+      >
+        {{ feature.buttonText }}
+      </ex-button>
+      }
+    </div>
+    }
+  </div>
+</div>

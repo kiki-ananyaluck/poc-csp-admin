@@ -1,0 +1,44 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.status-badge--pending {
+  background: #f5f5f5;
+  color: #595959;
+}
+
+.status-badge--in_progress,
+.status-badge--active,
+.status-badge--inprogress {
+  background: #e6f4ff;
+  color: #034ea1;
+}
+
+.status-badge--completed,
+.status-badge--approve {
+  background: #daffe5;
+  color: #197d3f;
+}
+
+.status-badge--cancelled,
+.status-badge--reject,
+.status-badge--cancel {
+  background: #fff1f0;
+  color: #cf1322;
+}
+
+.status-badge--force_stop {
+  background: #2e2e2e;
+  color: #ff4d4f;
+}
+
+.status-badge--notstarted {
+  background: #fafafa;
+  color: #8c8c8c;
+}

@@ -1,0 +1,14 @@
+<div class="thai-date-picker__field">
+  <label class="thai-date-picker__label" [attr.for]="inputId">{{
+    label()
+  }}</label>
+  <nz-date-picker
+    [id]="inputId"
+    [ngModel]="dateValue()"
+    (ngModelChange)="onDateChange($event)"
+    [nzFormat]="dateFormat()"
+    [nzPlaceHolder]="placeholder()"
+    nzSize="large"
+    [nzDropdownClassName]="dropdownClassName()"
+  ></nz-date-picker>
+</div>

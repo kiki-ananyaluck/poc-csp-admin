@@ -1,0 +1,17 @@
+<ex-modal
+  [isOpen]="state.isOpen()"
+  [leftButton]="cancelButton"
+  [rightButton]="confirmButton"
+  [closeOnEscape]="true"
+  [closeOnBackdrop]="true"
+  (closed)="state.close()"
+>
+  <div class="logout-confirm-modal">
+    <ex-icon
+      name="logout"
+      [size]="64"
+      color="var(--color-error-icon)"
+    ></ex-icon>
+    <h3 class="logout-confirm-modal__title">{{ modalTitle }}</h3>
+  </div>
+</ex-modal>

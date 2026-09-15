@@ -1,0 +1,17 @@
+export const TERM_VERSION_OPERATORS_MESSAGES = {
+  BREADCRUMB_HOME: 'ข้อกำหนดและเงื่อนไข',
+  BREADCRUMB_OPERATORS_PREFIX: 'ผู้ดำเนินการใน',
+  TITLE_PREFIX: 'ผู้ดำเนินการใน',
+  BTN_EXPORT: 'ส่งออกข้อมูล',
+  SUMMARY_LABEL: 'ผู้ดำเนินการ',
+  SUMMARY_UNIT: 'ผู้ใช้งาน',
+  SEARCH_PLACEHOLDER: 'ค้นหาจากชื่อผู้ดำเนินการ หรือ Email',
+  COL_INDEX: 'ลำดับที่',
+  COL_OPERATOR: 'ผู้ดำเนินการ',
+  COL_EMAIL: 'Email',
+  COL_ACCEPTANCE: 'การตอบรับ',
+  COL_ACCEPTED_AT: 'ตอบรับเมื่อ',
+  ACCEPTANCE_ACCEPTED: 'ยอมรับ',
+  EMPTY: 'ไม่มีข้อมูล',
+  NOT_FOUND: 'ไม่พบข้อมูล',
+} as const;

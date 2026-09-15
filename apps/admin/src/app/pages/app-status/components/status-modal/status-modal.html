@@ -1,0 +1,37 @@
+<ex-modal-input
+  [isOpen]="state.isOpen()"
+  [title]="messages.MODAL_STATUS_TITLE"
+  [subtitle]="state.targetRow?.name ?? ''"
+  width="520px"
+  [showTopDivider]="true"
+  [showCloseButton]="true"
+  [closeOnBackdrop]="false"
+  [leftButton]="cancelButton"
+  [rightButton]="confirmButton"
+  (closed)="state.close()"
+>
+  <ex-radio-box
+    [options]="statusOptions"
+    direction="vertical"
+    [(ngModel)]="selectedStatus"
+  ></ex-radio-box>
+
+  <div class="status-modal__desc">
+    <label class="status-modal__desc-label" for="statusDescription">
+      {{ messages.MODAL_STATUS_DESCRIPTION_LABEL }}
+    </label>
+    <textarea
+      id="statusDescription"
+      class="status-modal__textarea"
+      [class.status-modal__textarea--disabled]="state.selectedStatus() !== 'maintenance'"
+      [placeholder]="messages.MODAL_STATUS_DESCRIPTION_PLACEHOLDER"
+      [value]="state.description()"
+      (input)="state.description.set($any($event.target).value)"
+      [disabled]="state.selectedStatus() !== 'maintenance'"
+      rows="4"
+    ></textarea>
+    <span class="status-modal__desc-hint">
+      {{ messages.MODAL_STATUS_DESCRIPTION_HINT }}
+    </span>
+  </div>
+</ex-modal-input>

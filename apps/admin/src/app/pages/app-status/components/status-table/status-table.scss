@@ -1,0 +1,201 @@
+// ─── Table ────────────────────────────────────────────────────────────────────
+.status-table {
+  &__table {
+    border-radius: var(--radius-md, 8px);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  // ─── App cell (icon + name + version) ─────────────────────────────────────
+  &__app-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__app-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    background-color: #e6f0fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__app-icon-dots {
+    width: 24.5px;
+    height: 24.5px;
+    border-radius: 6px;
+    background-color: rgba(3, 78, 161, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    &::after {
+      content: '';
+      width: 14px;
+      height: 3px;
+      background: radial-gradient(circle, #034ea1 1.5px, transparent 1.5px);
+      background-size: 4.6px 3px;
+      background-repeat: repeat-x;
+      opacity: 1;
+    }
+  }
+
+  &__app-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__app-name {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    font-weight: 600;
+    color: var(--color-neutral-800, #1a1a1a);
+    line-height: 1.4;
+  }
+
+  &__app-version {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-sm, 12px);
+    color: var(--color-neutral-500, #595959);
+  }
+
+  // ─── Description cell ─────────────────────────────────────────────────────
+  &__desc-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__desc-text {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    color: var(--color-neutral-700, #2e2e2e);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+
+  // ─── Selection bar ────────────────────────────────────────────────────────
+  &__selection-bar-wrap {
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0;
+    pointer-events: none;
+  }
+
+  &__toast-wrap {
+    pointer-events: all;
+    width: fit-content;
+  }
+
+  &__selection-bar {
+    pointer-events: all;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 8px 8px 8px 16px;
+    background: var(--color-neutral-0, #ffffff);
+    border: 1px solid var(--color-neutral-200, #d9d9d9);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+  }
+
+  &__selection-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 20px;
+  }
+
+  &__selection-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--color-primary-secondary, #ddeaf9);
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    font-weight: 700;
+    color: var(--color-primary-default, #034ea1);
+  }
+
+  &__selection-label {
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    color: var(--color-neutral-700, #2e2e2e);
+  }
+
+  &__selection-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--color-neutral-200, #d9d9d9);
+    margin: 0 8px;
+    flex-shrink: 0;
+  }
+
+  &__bulk-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-families-base, 'Anuphan', sans-serif);
+    font-size: var(--font-sizes-body-md, 14px);
+    color: var(--color-neutral-700, #2e2e2e);
+    transition:
+      background 0.15s,
+      color 0.15s;
+
+    &:hover:not(:disabled) {
+      background: var(--color-neutral-100, #f5f5f5);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      color: var(--color-neutral-400, #bfbfbf);
+    }
+  }
+
+  // ─── Status dots ──────────────────────────────────────────────────────────
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--active {
+      background: var(--color-success, #52c41a);
+    }
+
+    &--maintenance {
+      background: var(--color-warning, #faad14);
+    }
+
+    &--inactive {
+      background: var(--color-neutral-400, #8c8c8c);
+    }
+
+    .status-table__bulk-btn:disabled &--active,
+    .status-table__bulk-btn:disabled &--maintenance {
+      background: var(--color-neutral-400, #bfbfbf);
+    }
+  }
+}

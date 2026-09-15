@@ -1,0 +1,72 @@
+<div class="notification-page" [attr.data-testid]="selectors.HOST">
+  <!-- Page Title -->
+  <h1 class="notification-page__title">{{ messages.PAGE_TITLE }}</h1>
+
+  <!-- Tabs -->
+  <div class="notification-page__tabs">
+    <button
+      class="notification-page__tab"
+      [class.notification-page__tab--active]="state.activeTab() === 'all'"
+      [attr.data-testid]="selectors.TAB_ALL"
+      (click)="state.setTab('all')"
+    >
+      {{ messages.TAB_ALL }}
+    </button>
+    <button
+      class="notification-page__tab"
+      [class.notification-page__tab--active]="state.activeTab() === 'unread'"
+      [attr.data-testid]="selectors.TAB_UNREAD"
+      (click)="state.setTab('unread')"
+    >
+      {{ messages.TAB_UNREAD }}
+    </button>
+  </div>
+
+  <!-- List -->
+  <div class="notification-page__list" [attr.data-testid]="selectors.LIST">
+    @if (state.isLoading()) { @for (s of skeletonItems; track $index) {
+    <div class="notification-page__skeleton-row">
+      <ex-skeleton
+        [loading]="true"
+        nzType="avatar"
+        [nzAvatar]="true"
+        [nzParagraph]="{ rows: 2 }"
+        [nzTitle]="false"
+      ></ex-skeleton>
+    </div>
+    } } @else if (state.items().length === 0) {
+    <div class="notification-page__empty" [attr.data-testid]="selectors.EMPTY">
+      <p>
+        {{ state.activeTab() === 'unread' ? messages.EMPTY_UNREAD :
+        messages.EMPTY_ALL }}
+      </p>
+    </div>
+    } @else { @for (item of state.items(); track item.id) {
+    <ex-layout-notification-item
+      [item]="$any(item)"
+      (clicked)="onItemClicked($event)"
+    ></ex-layout-notification-item>
+    }
+
+    <!-- Loading more indicator -->
+    @if (state.isLoadingMore()) { @for (s of skeletonMoreItems; track $index) {
+    <div class="notification-page__skeleton-row">
+      <ex-skeleton
+        [loading]="true"
+        nzType="avatar"
+        [nzAvatar]="true"
+        [nzParagraph]="{ rows: 2 }"
+        [nzTitle]="false"
+      ></ex-skeleton>
+    </div>
+    } }
+
+    <!-- IntersectionObserver sentinel -->
+    <div
+      #sentinel
+      class="notification-page__sentinel"
+      [attr.data-testid]="selectors.LOAD_MORE_SENTINEL"
+    ></div>
+    }
+  </div>
+</div>

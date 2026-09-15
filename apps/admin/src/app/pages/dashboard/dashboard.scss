@@ -1,0 +1,33 @@
+.dashboard {
+  padding: 32px 24px;
+
+  &__header {
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--color-primary-default);
+  }
+
+  &__subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--color-primary-secondary);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__description {
+    font-size: 14px;
+    color: var(--color-neutral-gray);
+    margin: 0;
+  }
+}

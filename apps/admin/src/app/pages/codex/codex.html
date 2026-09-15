@@ -1,0 +1,55 @@
+<div class="dmt">
+  <app-dmt-toolbar
+    [pageTitle]="pageTitle"
+    [breadcrumbs]="breadcrumbs"
+    [showDownloadTemplate]="true"
+    [showImport]="true"
+    (addClick)="addClick()"
+    (openImportClick)="state.openImportModal()"
+    (downloadTemplateClick)="onDownloadTemplate()"
+    (downloadDataClick)="onDownloadData()"
+  ></app-dmt-toolbar>
+
+  <app-dmt-search-filter
+    [filteredTotal]="state.total()"
+    [appliedStatusActive]="state.appliedStatusActive()"
+    [appliedStatusInactive]="state.appliedStatusInactive()"
+    (searchChange)="onSearchChange($event)"
+    (filterApply)="onFilterApply($event)"
+    (removeActiveChip)="onRemoveChip($event)"
+  ></app-dmt-search-filter>
+
+  <app-dmt-data-table
+    [data]="state.rows()"
+    [total]="state.total()"
+    [loading]="state.loading()"
+    [deleteHandler]="deleteHandler"
+    (editClick)="onEditClick($event)"
+    (sortChange)="onSortChange($event)"
+  ></app-dmt-data-table>
+
+  @if (state.showSuccessToast()) {
+  <div class="dmt__toast-wrap">
+    <ex-toast
+      variant="success"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="state.dismissToast()"
+      >{{ state.toastMessage() }}</ex-toast
+    >
+  </div>
+  }
+</div>
+
+<app-dmt-import-modal
+  [isOpen]="state.isImportModalOpen()"
+  [importHandler]="importHandler"
+  [importNetworkError]="state.importNetworkError()"
+  [importMissingColumns]="[]"
+  (close)="state.closeImportModal()"
+  (importSuccess)="onImportSuccess()"
+></app-dmt-import-modal>
+
+<app-codex-modal-upsert></app-codex-modal-upsert>

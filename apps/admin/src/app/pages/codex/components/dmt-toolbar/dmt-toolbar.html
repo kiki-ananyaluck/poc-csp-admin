@@ -1,0 +1,67 @@
+<nz-breadcrumb class="dmt__breadcrumb" nzSeparator=">">
+  @for (item of breadcrumbs; track $index) { @if (item.routerLink) {
+  <nz-breadcrumb-item>
+    <a [routerLink]="item.routerLink">{{ item.label }}</a>
+  </nz-breadcrumb-item>
+  } @else {
+  <nz-breadcrumb-item>{{ item.label }}</nz-breadcrumb-item>
+  } }
+</nz-breadcrumb>
+
+<div class="dmt__header">
+  <h1 class="dmt__title">{{ pageTitle }}</h1>
+  <div class="dmt__actions">
+    <div class="dmt__secondary-actions">
+      @if (showDownloadTemplate) {
+      <div class="dmt__download-wrap">
+        <ex-button
+          variant="outline"
+          size="small"
+          icon="import"
+          iconRight="{{ isDownloadMenuOpen() ? 'chevron-up' : 'chevron-down' }}"
+          [iconSize]="16"
+          (click)="isDownloadMenuOpen.set(!isDownloadMenuOpen())"
+          >{{ messages.DOWNLOAD_BUTTON }}</ex-button
+        >
+        @if (isDownloadMenuOpen()) {
+        <div class="dmt__download-menu">
+          <ex-button
+            variant="text"
+            size="small"
+            icon="paper-1"
+            [iconSize]="14"
+            (click)="onDownloadTemplate()"
+            >{{ messages.DOWNLOAD_TEMPLATE }}</ex-button
+          >
+          <ex-button
+            variant="text"
+            size="small"
+            icon="document"
+            [iconSize]="18"
+            (click)="onDownloadData()"
+            >{{ messages.DOWNLOAD_DATA }}</ex-button
+          >
+        </div>
+        }
+      </div>
+      } @if (showImport) {
+      <ex-button
+        variant="outline"
+        size="small"
+        icon="export"
+        [iconSize]="16"
+        (click)="openImportClick.emit()"
+        >{{ messages.IMPORT_BUTTON }}</ex-button
+      >
+      }
+    </div>
+    <ex-button
+      variant="primary"
+      size="small"
+      icon="add"
+      [iconSize]="16"
+      (click)="addClick.emit()"
+      >{{ messages.ADD_BUTTON }}</ex-button
+    >
+  </div>
+</div>

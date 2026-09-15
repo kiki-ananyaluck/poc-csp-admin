@@ -1,0 +1,155 @@
+<div class="noti-info-page" [attr.data-testid]="selectors.HOST">
+  <!-- Back button -->
+  <button
+    class="noti-info-page__back"
+    [attr.data-testid]="selectors.BACK_BTN"
+    (click)="goBack()"
+  >
+    {{ messages.BACK }}
+  </button>
+
+  @if (state.isLoading()) {
+  <div class="noti-info-card">
+    <div class="noti-info-card__header-img"></div>
+    <div class="noti-info-card__body">
+      <ex-skeleton
+        [loading]="true"
+        nzType="input"
+        [height]="16"
+        color="#e0e0e0"
+      ></ex-skeleton>
+      <div class="noti-info-card__skeleton-spacer"></div>
+      <ex-skeleton
+        [loading]="true"
+        nzType="input"
+        [height]="24"
+        color="#e0e0e0"
+      ></ex-skeleton>
+      <div class="noti-info-card__skeleton-spacer"></div>
+      <ex-skeleton
+        [loading]="true"
+        nzType="input"
+        [height]="14"
+        color="#e0e0e0"
+      ></ex-skeleton>
+    </div>
+  </div>
+  } @else if (!state.item()) {
+  <div class="noti-info-page__not-found">
+    <p>{{ messages.NOT_FOUND }}</p>
+  </div>
+  } @else {
+  <div class="noti-info-card" [attr.data-testid]="selectors.CARD">
+    <!-- Envelope header image -->
+    <div class="noti-info-card__header-img">
+      <!-- <ex-icon name="group" [size]="96" color="#576B9D"></ex-icon> -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="104"
+        height="104"
+        viewBox="0 0 104 104"
+        fill="none"
+      >
+        <g filter="url(#filter0_d_243_40414)">
+          <path
+            d="M93.9999 88.357C94.002 88.9689 93.8833 89.5753 93.6506 90.1413C93.4179 90.7072 93.0758 91.2217 92.6439 91.6553C92.2121 92.0888 91.6988 92.4328 91.1338 92.6676C90.5686 92.9024 89.9628 93.0234 89.3508 93.0236L14.78 93.1751C14.1683 93.1766 13.5621 93.0576 12.9964 92.8247C12.4307 92.5918 11.9164 92.2497 11.4829 91.8179C11.0495 91.3861 10.7055 90.8732 10.4705 90.3083C10.2355 89.7434 10.1142 89.1378 10.1135 88.526L10.0087 36.0933L51.2848 10.1799C51.4695 10.0634 51.6832 10.001 51.9015 10C52.1199 9.99898 52.3341 10.0593 52.5199 10.1741L92.928 35.3241L93.895 35.9241V36.7631L93.9999 88.357Z"
+            fill="#576B9D"
+          />
+          <path
+            d="M89.2765 92.9504L52.2634 64.7294C52.2336 64.7067 52.2096 64.6772 52.1934 64.6434C52.1772 64.6096 52.1693 64.5724 52.1702 64.5349C52.1712 64.4975 52.1811 64.4608 52.199 64.4278C52.2169 64.3949 52.2424 64.3667 52.2733 64.3456L93.5226 36.1526C93.5582 36.1283 93.5997 36.1142 93.6426 36.1117C93.6856 36.1093 93.7284 36.1186 93.7665 36.1386C93.8046 36.1587 93.8365 36.1887 93.8588 36.2256C93.8811 36.2624 93.8929 36.3046 93.893 36.3477L93.9972 88.3327C93.9996 89.5538 93.5227 90.7272 92.6689 91.6003C91.8152 92.4735 90.6529 92.9767 89.4319 93.0017C89.3759 93.0025 89.3211 92.9844 89.2765 92.9504Z"
+            fill="#A2BDFF"
+          />
+          <path
+            d="M14.8423 93.0983L51.7423 64.7299C51.772 64.7071 51.7959 64.6775 51.8119 64.6436C51.828 64.6097 51.8358 64.5725 51.8347 64.535C51.8336 64.4976 51.8236 64.4609 51.8055 64.4281C51.7875 64.3952 51.7619 64.3671 51.7308 64.3461L10.3697 36.3181C10.334 36.2939 10.2925 36.28 10.2495 36.2777C10.2065 36.2754 10.1637 36.2848 10.1257 36.305C10.0877 36.3252 10.0559 36.3554 10.0338 36.3923C10.0116 36.4292 9.99994 36.4715 10 36.5145L10.1042 88.4995C10.1066 89.7206 10.5882 90.8919 11.4453 91.7616C12.3024 92.6314 13.4665 93.13 14.6874 93.1503C14.7434 93.1508 14.798 93.1325 14.8423 93.0983Z"
+            fill="#A2BDFF"
+          />
+          <path
+            d="M89.3453 93.003L14.7747 93.1521C13.6465 93.1512 12.5569 92.7421 11.7068 92.0005C10.8567 91.2589 10.3037 90.2348 10.1497 89.1172C10.1244 88.9267 10.1464 88.7328 10.2139 88.5528C10.2814 88.3728 10.3922 88.2122 10.5366 88.0853L51.2078 52.1031C51.4202 51.9151 51.6939 51.8111 51.9775 51.8105C52.2611 51.81 52.5352 51.9129 52.7484 52.1L93.5627 87.9193C93.7076 88.0456 93.8191 88.2057 93.8873 88.3854C93.9555 88.5652 93.9783 88.7589 93.9537 88.9496C93.8043 90.0677 93.2554 91.094 92.4083 91.839C91.5613 92.584 90.4734 92.9974 89.3453 93.003Z"
+            fill="#7097CD"
+          />
+        </g>
+        <defs>
+          <filter
+            id="filter0_d_243_40414"
+            x="0"
+            y="0"
+            width="104"
+            height="103.176"
+            filterUnits="userSpaceOnUse"
+            color-interpolation-filters="sRGB"
+          >
+            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feColorMatrix
+              in="SourceAlpha"
+              type="matrix"
+              values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+              result="hardAlpha"
+            />
+            <feOffset />
+            <feGaussianBlur stdDeviation="5" />
+            <feComposite in2="hardAlpha" operator="out" />
+            <feColorMatrix
+              type="matrix"
+              values="0 0 0 0 0.543419 0 0 0 0 0.543419 0 0 0 0 0.543419 0 0 0 0.2 0"
+            />
+            <feBlend
+              mode="normal"
+              in2="BackgroundImageFix"
+              result="effect1_dropShadow_243_40414"
+            />
+            <feBlend
+              mode="normal"
+              in="SourceGraphic"
+              in2="effect1_dropShadow_243_40414"
+              result="shape"
+            />
+          </filter>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Card body -->
+    <div class="noti-info-card__body">
+      <!-- Status icon (absolutely positioned at top-right) -->
+      <div
+        class="noti-info-card__status-icon"
+        [attr.data-testid]="selectors.STATUS_ICON"
+        [style.background-color]="iconConfig().bgColor"
+      >
+        <ex-icon
+          [name]="iconConfig().name"
+          [size]="20"
+          [color]="iconConfig().color"
+        ></ex-icon>
+      </div>
+
+      <!-- Date-time -->
+      <p class="noti-info-card__date">{{ relativeTime() }}</p>
+
+      <!-- Title -->
+      <h2 class="noti-info-card__title">{{ state.item()!.title }}</h2>
+
+      <!-- Subtitle -->
+      <p class="noti-info-card__subtitle">{{ state.item()!.subtitle }}</p>
+
+      <!-- Special detail -->
+      @if (state.item()!.specialDetail) {
+      <!-- Divider -->
+      <hr class="noti-info-card__divider" />
+
+      <p class="noti-info-card__special-detail">
+        {{ state.item()!.specialDetail }}
+      </p>
+      }
+
+      <!-- HTML Detail -->
+      @if (state.item()!.detail) {
+      <div
+        class="noti-info-card__detail"
+        [innerHTML]="state.item()!.detail"
+      ></div>
+      }
+    </div>
+  </div>
+  }
+</div>

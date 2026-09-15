@@ -1,0 +1,14 @@
+<ex-modal
+  [isOpen]="isOpen()"
+  iconColor="#FF4D4F"
+  [title]="modalTitle"
+  [rightButton]="okButton"
+  [closeOnEscape]="true"
+  [closeOnBackdrop]="true"
+>
+  <div class="access-denied-modal">
+    <ex-icon name="danger" [size]="64" color="#FF1111"></ex-icon>
+    <h3 class="access-denied-modal__title">{{ modalTitle }}</h3>
+    <p class="access-denied-modal__description">{{ subtitle() }}</p>
+  </div>
+</ex-modal>

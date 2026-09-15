@@ -1,0 +1,174 @@
+<div class="workflow-approval" [attr.data-testid]="selectors.CONTAINER">
+  <div class="workflow-approval__header" [attr.data-testid]="selectors.HEADER">
+    <h2 class="workflow-approval__title" [attr.data-testid]="selectors.TITLE">{{ messages.PAGE_TITLE }}</h2>
+    <ex-button [attr.data-testid]="selectors.BUTTON_REFRESH" variant="text" size="small" (click)="loadPendingApprovals()">
+      {{ messages.BUTTON_REFRESH }}
+    </ex-button>
+  </div>
+
+  <!-- Empty State -->
+  @if (!state.isLoading() && state.tableData().length === 0) {
+    <div class="workflow-approval__empty" [attr.data-testid]="selectors.EMPTY_STATE">
+      <p class="workflow-approval__empty-text">{{ messages.EMPTY_TEXT }}</p>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (state.isLoading() || state.tableData().length > 0) {
+    <ex-table
+      [attr.data-testid]="selectors.TABLE"
+      [data]="state.tableData()"
+      [total]="state.tableData().length"
+      [loading]="state.isLoading()"
+      [showCustomPagination]="true"
+      customPaginationType="full"
+      [pageSize]="20"
+      [nzPageSizeOptions]="[10, 20, 50]"
+      nzSize="middle"
+    >
+      <ex-column key="index" [title]="messages.TABLE_COL_INDEX" width="60px">
+        <ng-template exCell let-row="row" let-index="index">{{ row.index }}</ng-template>
+      </ex-column>
+      <ex-column key="documentId" [title]="messages.TABLE_COL_DOC_ID" width="160px">
+        <ng-template exCell let-row="row">
+          <button class="workflow-approval__link" type="button" (click)="navigateToDocument(row)">{{ row.documentId }}</button>
+        </ng-template>
+      </ex-column>
+      <ex-column key="workflowName" [title]="messages.TABLE_COL_WORKFLOW_NAME">
+        <ng-template exCell let-row="row">{{ row.workflowName }}</ng-template>
+      </ex-column>
+      <ex-column key="businessType" [title]="messages.TABLE_COL_BUSINESS_TYPE" width="140px">
+        <ng-template exCell let-row="row">{{ row.businessType }}</ng-template>
+      </ex-column>
+      <ex-column key="stepName" [title]="messages.TABLE_COL_STEP_NAME" width="150px">
+        <ng-template exCell let-row="row">{{ row.stepName }}</ng-template>
+      </ex-column>
+      <ex-column key="assignmentPolicy" [title]="messages.TABLE_COL_POLICY" width="100px">
+        <ng-template exCell let-row="row">
+          <app-assignment-policy-badge [policy]="row.assignmentPolicy"></app-assignment-policy-badge>
+        </ng-template>
+      </ex-column>
+      <ex-column key="createdAt" [title]="messages.TABLE_COL_CREATED_AT" width="150px">
+        <ng-template exCell let-row="row">{{ row.createdAt }}</ng-template>
+      </ex-column>
+      <ex-column key="status" [title]="messages.TABLE_COL_STATUS" width="120px">
+        <ng-template exCell let-row="row">
+          <app-status-badge [status]="row.status"></app-status-badge>
+        </ng-template>
+      </ex-column>
+      <ex-column key="actions" [title]="messages.TABLE_COL_ACTIONS" width="320px">
+        <ng-template exCell let-row="row">
+          <div class="workflow-approval__actions">
+            <ex-button variant="text" size="small" (click)="navigateToDocument(row)">
+              {{ messages.BUTTON_VIEW_DETAIL }}
+            </ex-button>
+            <ex-button
+              variant="primary"
+              size="small"
+              [disabled]="state.isActioning()"
+              (click)="openActionDialog(row, 'APPROVE')"
+            >
+              {{ messages.BUTTON_APPROVE }}
+            </ex-button>
+            @if (row.allowReject) {
+              <ex-button
+                variant="outline"
+                size="small"
+                [disabled]="state.isActioning()"
+                (click)="openActionDialog(row, 'REJECT')"
+              >
+                {{ messages.BUTTON_REJECT }}
+              </ex-button>
+            }
+            <ex-button
+              variant="text"
+              size="small"
+              [disabled]="state.isActioning()"
+              (click)="openActionDialog(row, 'FORCE_STOP')"
+            >
+              {{ messages.BUTTON_FORCE_STOP }}
+            </ex-button>
+            <ex-button
+              variant="text"
+              size="small"
+              [disabled]="state.isActioning()"
+              (click)="openActionDialog(row, 'RESUBMIT')"
+            >
+              {{ messages.BUTTON_RESUBMIT }}
+            </ex-button>
+          </div>
+        </ng-template>
+      </ex-column>
+    </ex-table>
+  }
+
+  <!-- Action Confirm Dialog -->
+  <ex-modal
+    [attr.data-testid]="selectors.MODAL_ACTION"
+    [isOpen]="state.dialogOpen()"
+    [title]="state.dialogTitle()"
+    [closeOnBackdrop]="true"
+    [closeOnEscape]="true"
+    [leftButton]="leftButton"
+    [rightButton]="rightButton"
+    [rightButtonDisabled]="state.isActioning()"
+    width="480"
+  >
+    @if (state.selectedTask()) {
+      <div class="workflow-approval__dialog-body">
+        <div class="workflow-approval__dialog-info">
+          <p><strong>{{ messages.DIALOG_DOC_LABEL }}</strong> {{ state.selectedTask()!.documentId }}</p>
+          <p><strong>{{ messages.DIALOG_STEP_LABEL }}</strong> {{ state.selectedTask()!.stepName }}</p>
+          <p><strong>{{ messages.DIALOG_TYPE_LABEL }}</strong> {{ state.selectedTask()!.businessType }}</p>
+        </div>
+
+        @if (state.selectedDialogType() === 'FORCE_STOP') {
+          <p class="workflow-approval__dialog-warning">
+            {{ messages.DIALOG_FORCE_STOP_WARNING }}
+          </p>
+        }
+
+        @if (state.selectedDialogType() === 'RESUBMIT') {
+          <p class="workflow-approval__dialog-note">
+            {{ messages.DIALOG_RESUBMIT_NOTE }}
+          </p>
+        }
+
+        @if (state.selectedDialogType() !== 'RESUBMIT') {
+          <div class="workflow-approval__dialog-remark">
+            <label for="workflow-approval-remark">
+              {{ messages.DIALOG_REMARK_LABEL }}{{ state.remarkRequired() ? messages.DIALOG_REMARK_REQUIRED_SUFFIX : '' }}
+            </label>
+            <textarea
+              id="workflow-approval-remark"
+              [attr.data-testid]="selectors.REMARK_TEXTAREA"
+              [ngModel]="state.remark()"
+              (ngModelChange)="state.remark.set($event)"
+              [placeholder]="messages.DIALOG_REMARK_PLACEHOLDER"
+              maxlength="500"
+              rows="3"
+              [class.workflow-approval__dialog-remark--error]="state.remarkError()"
+            ></textarea>
+            @if (state.remarkError()) {
+              <span class="workflow-approval__dialog-error" [attr.data-testid]="selectors.REMARK_ERROR">{{ state.remarkError() }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </ex-modal>
+
+  <!-- Toast -->
+  @if (state.showToastFlag()) {
+    <div class="workflow-approval__toast-wrap">
+      <ex-toast
+        [attr.data-testid]="selectors.TOAST"
+        [variant]="state.toastVariant()"
+        [autoDismiss]="true"
+        [autoDismissTime]="3000"
+        [showCloseButton]="true"
+        (dismiss)="dismissToast()"
+      >{{ state.toastMessage() }}</ex-toast>
+    </div>
+  }
+</div>

@@ -1,0 +1,180 @@
+<div class="api-demo">
+  <app-dmt-toolbar
+    [pageTitle]="pageTitle"
+    [breadcrumbs]="breadcrumbs"
+    [showDownloadTemplate]="false"
+    [showImport]="false"
+    (addClick)="goToDocumentNumbers()"
+  ></app-dmt-toolbar>
+
+  <section class="api-demo__intro">
+    <h2>{{ messages.PAGE_TITLE }}</h2>
+    <p>{{ messages.PAGE_SUBTITLE }}</p>
+  </section>
+
+  <section class="api-demo__control-panel">
+    <div class="api-demo__search">
+      <span>{{ messages.POLICY_LIST_LABEL }}</span>
+      <ex-search-input
+        [placeholder]="messages.POLICY_SEARCH_PLACEHOLDER"
+        (valueChange)="onSearchInput($event)"
+      ></ex-search-input>
+    </div>
+
+    <div class="api-demo__selected">
+      <span>{{ messages.SELECTED_POLICY_LABEL }}</span>
+      <strong>{{ selectedPolicyCode() || '-' }}</strong>
+    </div>
+
+    <div class="api-demo__count">
+      <span>{{ messages.CONCURRENT_COUNT_LABEL }}</span>
+      <input
+        type="number"
+        min="1"
+        max="20"
+        [value]="concurrentCount()"
+        (input)="setConcurrentCount(($any($event.target).value))"
+      />
+    </div>
+  </section>
+
+  @if (filteredPolicies().length > 0) {
+  <section class="api-demo__policy-list">
+    @for (policy of filteredPolicies(); track policy.id) {
+    <button
+      type="button"
+      class="api-demo__policy-item"
+      [class.api-demo__policy-item--active]="selectedPolicyCode() === policy.policyCode"
+      (click)="selectPolicy(policy.policyCode)"
+    >
+      <div class="api-demo__policy-main">
+        <strong>{{ policy.policyCode }}</strong>
+        <span>{{ policy.description }}</span>
+      </div>
+      <ex-tag
+        [variant]="policy.status.toUpperCase() === 'ACTIVE' ? 'success' : 'default-light'"
+      >
+        {{ policy.status }}
+      </ex-tag>
+    </button>
+    }
+  </section>
+  }
+
+  <section class="api-demo__actions">
+    <ex-button
+      variant="outline"
+      size="small"
+      [disabled]="isLoading()"
+      (click)="callCurrent()"
+    >
+      {{ messages.CURRENT_BUTTON }}
+    </ex-button>
+    <ex-button
+      variant="primary"
+      size="small"
+      [disabled]="isLoading()"
+      (click)="callGenerateOnce()"
+    >
+      {{ messages.GENERATE_BUTTON }}
+    </ex-button>
+    <ex-button
+      variant="primary"
+      size="small"
+      [disabled]="isLoading()"
+      (click)="callGenerateConcurrent()"
+    >
+      {{ messages.CONCURRENT_BUTTON }}
+    </ex-button>
+    <ex-button
+      variant="outline"
+      size="small"
+      [disabled]="isLoading()"
+      (click)="callReset()"
+    >
+      {{ messages.RESET_BUTTON }}
+    </ex-button>
+  </section>
+
+  <section class="api-demo__result-grid">
+    <article>
+      <h3>{{ messages.SECTION_CURRENT }}</h3>
+      <pre>
+{{ currentResult() ? toJson(currentResult()) : messages.EMPTY_RESULT }}</pre
+      >
+    </article>
+    <article>
+      <h3>{{ messages.SECTION_GENERATE }}</h3>
+      <pre>
+{{ generatedResult() ? toJson(generatedResult()) : messages.EMPTY_RESULT }}</pre
+      >
+    </article>
+    <article>
+      <h3>{{ messages.SECTION_CONCURRENT }}</h3>
+      <pre>
+{{ concurrentResult().length > 0 ? toJson(concurrentResult()) : messages.EMPTY_RESULT }}</pre
+      >
+    </article>
+    <article>
+      <h3>{{ messages.SECTION_RESET }}</h3>
+      <pre>
+{{ resetResult() ? toJson(resetResult()) : messages.EMPTY_RESULT }}</pre
+      >
+    </article>
+  </section>
+
+  <section class="api-demo__samples">
+    <h3>{{ messages.API_SAMPLE_TITLE }}</h3>
+    <pre>
+GET /api/centralized-service/v1/document-numbers/configs/{{ '{' }}configCode{{ '}' }}/current</pre
+    >
+    <pre>POST /api/centralized-service/v1/document-numbers/generate</pre>
+    <pre>
+POST /api/centralized-service/v1/document-numbers/configs/{{ '{' }}configCode{{ '}' }}/reset</pre
+    >
+  </section>
+
+  <section class="api-demo__logs">
+    <h3>{{ messages.LOG_TITLE }}</h3>
+    @if (logs().length === 0) {
+    <p>{{ messages.EMPTY_LOG }}</p>
+    } @else { @for (log of logs(); track log.id) {
+    <article class="api-demo__log-item">
+      <header>
+        <strong>{{ log.action }}</strong>
+        <div>
+          <ex-tag [variant]="log.status === 'success' ? 'success' : 'error'">
+            {{ log.status === 'success' ? messages.STATUS_SUCCESS :
+            messages.STATUS_ERROR }}
+          </ex-tag>
+          <span>{{ log.timestamp | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
+        </div>
+      </header>
+      <div class="api-demo__log-content">
+        <div>
+          <h4>{{ messages.REQUEST_LABEL }}</h4>
+          <pre>{{ toJson(log.request) }}</pre>
+        </div>
+        <div>
+          <h4>{{ messages.RESPONSE_LABEL }}</h4>
+          <pre>{{ toJson(log.response) }}</pre>
+        </div>
+      </div>
+    </article>
+    } }
+  </section>
+
+  @if (toastMessage(); as message) {
+  <div class="api-demo__toast-wrap">
+    <ex-toast
+      [variant]="toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="dismissToast()"
+      >{{ message }}</ex-toast
+    >
+  </div>
+  }
+</div>

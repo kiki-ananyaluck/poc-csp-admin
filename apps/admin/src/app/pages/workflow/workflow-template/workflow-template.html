@@ -1,0 +1,146 @@
+<div class="workflow-template" [attr.data-testid]="selectors.CONTAINER">
+  @if (!state.showSummary()) {
+    <div class="workflow-template__hero">
+      <div class="workflow-template__hero-copy">
+        <ex-title
+          class="workflow-template__title-block"
+          [attr.data-testid]="selectors.TITLE"
+          [title]="messages.PAGE_TITLE"
+          [subtitle]="messages.SUBTITLE"
+        ></ex-title>
+      </div>
+    </div>
+
+    <div class="workflow-template__meta-form">
+
+      <div class="workflow-template__form-row">
+        <div class="workflow-template__field">
+          <span class="workflow-template__label">
+            {{ messages.LABEL_TEMPLATE_CODE }}
+            <span class="workflow-template__required">*</span>
+          </span>
+          <ex-input-field
+            class="workflow-template__control"
+            [attr.data-testid]="selectors.FORM_CODE"
+            [ngModel]="state.templateCode()"
+            (ngModelChange)="state.templateCode.set($event)"
+            [placeholder]="messages.PLACEHOLDER_TEMPLATE_CODE"
+            [error]="state.showErrorToast() && state.submitError() === messages.ERROR_REQUIRED_CODE"
+            [helperText]="
+              state.showErrorToast() && state.submitError() === messages.ERROR_REQUIRED_CODE
+                ? messages.ERROR_REQUIRED_CODE
+                : ''
+            "
+          ></ex-input-field>
+        </div>
+
+        <div class="workflow-template__field">
+          <span class="workflow-template__label">
+            {{ messages.LABEL_TEMPLATE_NAME }}
+            <span class="workflow-template__required">*</span>
+          </span>
+          <ex-input-field
+            class="workflow-template__control"
+            [attr.data-testid]="selectors.FORM_NAME"
+            [ngModel]="state.templateName()"
+            (ngModelChange)="state.templateName.set($event)"
+            [placeholder]="messages.PLACEHOLDER_TEMPLATE_NAME"
+            [error]="state.showErrorToast() && state.submitError() === messages.ERROR_REQUIRED_NAME"
+            [helperText]="
+              state.showErrorToast() && state.submitError() === messages.ERROR_REQUIRED_NAME
+                ? messages.ERROR_REQUIRED_NAME
+                : ''
+            "
+          ></ex-input-field>
+        </div>
+      </div>
+
+      <div class="workflow-template__field">
+        <span class="workflow-template__label">{{ messages.LABEL_DESCRIPTION }}</span>
+        <ex-input-field
+          class="workflow-template__control"
+          [attr.data-testid]="selectors.FORM_DESC"
+          [ngModel]="state.description()"
+          (ngModelChange)="state.description.set($event)"
+          [placeholder]="messages.PLACEHOLDER_DESCRIPTION"
+        ></ex-input-field>
+      </div>
+
+      <div class="workflow-template__field" [attr.data-testid]="selectors.FORM_BUSINESS_TYPES">
+        <span class="workflow-template__label">
+          {{ messages.LABEL_BUSINESS_TYPES }}
+          <span class="workflow-template__required">*</span>
+        </span>
+        <div class="workflow-template__business-block">
+          <ex-input-field
+            class="workflow-template__control"
+            [ngModel]="state.businessTypeInput()"
+            (ngModelChange)="onBusinessTypeInputChange($event)"
+            [placeholder]="messages.PLACEHOLDER_BUSINESS_TYPES"
+            [error]="
+              state.showErrorToast() &&
+              state.submitError() === messages.ERROR_REQUIRED_BUSINESS_TYPE
+            "
+            [helperText]="
+              state.showErrorToast() &&
+              state.submitError() === messages.ERROR_REQUIRED_BUSINESS_TYPE
+                ? messages.ERROR_REQUIRED_BUSINESS_TYPE
+                : ''
+            "
+          ></ex-input-field>
+        </div>
+      </div>
+    </div>
+
+    <div class="workflow-template__builder" [attr.data-testid]="selectors.BUILDER">
+      <app-workflow-builder />
+    </div>
+
+    <div class="workflow-template__footer">
+      <ex-button
+        [attr.data-testid]="selectors.BUTTON_SUBMIT"
+        variant="primary"
+        (click)="goToSummary()"
+      >
+        {{ messages.BUTTON_NEXT }}
+      </ex-button>
+    </div>
+  } @else {
+    <app-workflow-template-summary
+      [isEditable]="false"
+      [template]="null"
+      [newAssignee]="null"
+      [templateCode]="state.templateCode()"
+      [templateName]="state.templateName()"
+      [description]="state.description()"
+      [businessType]="state.businessType()"
+      [submitting]="state.submitting()"
+      (submitted)="submit()"
+      (back)="backToBuilder()"
+    />
+  }
+
+  <div class="toast-container">
+    @if (state.showSuccessToast()) {
+      <ex-toast
+        [attr.data-testid]="selectors.TOAST_SUCCESS"
+        variant="success"
+        [autoDismiss]="true"
+        [autoDismissTime]="5000"
+      >
+        {{ messages.TOAST_SUCCESS }}
+      </ex-toast>
+    }
+
+    @if (state.showErrorToast()) {
+      <ex-toast
+        [attr.data-testid]="selectors.TOAST_ERROR"
+        variant="error"
+        [autoDismiss]="true"
+        [autoDismissTime]="5000"
+      >
+        {{ state.submitError() || messages.TOAST_ERROR }}
+      </ex-toast>
+    }
+  </div>
+</div>

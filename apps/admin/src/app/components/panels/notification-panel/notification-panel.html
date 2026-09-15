@@ -1,0 +1,92 @@
+<!-- Backdrop -->
+@if (isOpen()) {
+<div
+  class="noti-panel-backdrop"
+  [attr.data-testid]="selectors.OVERLAY"
+  role="button"
+  tabindex="0"
+  (click)="onClose()"
+  (keydown.enter)="onClose()"
+  (keydown.space)="onClose()"
+></div>
+
+<!-- Drawer -->
+<div class="noti-panel" [attr.data-testid]="selectors.HOST">
+  <!-- Header + Tabs combined -->
+  <div class="noti-panel__top-bar">
+    <div class="noti-panel__header-row">
+      <span class="noti-panel__title">{{ messages.PANEL_TITLE }}</span>
+      <button
+        class="noti-panel__read-all"
+        [attr.data-testid]="selectors.READ_ALL_BTN"
+        (click)="onMarkAllRead()"
+      >
+        {{ messages.READ_ALL }}
+      </button>
+    </div>
+    <div class="noti-panel__tabs">
+      <button
+        class="noti-panel__tab"
+        [class.noti-panel__tab--active]="state.activeTab() === 'all'"
+        [attr.data-testid]="selectors.TAB_ALL"
+        (click)="state.setTab('all')"
+      >
+        {{ messages.TAB_ALL }}
+      </button>
+      <button
+        class="noti-panel__tab"
+        [class.noti-panel__tab--active]="state.activeTab() === 'unread'"
+        [attr.data-testid]="selectors.TAB_UNREAD"
+        (click)="state.setTab('unread')"
+      >
+        {{ messages.TAB_UNREAD }}
+      </button>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="noti-panel__list" [attr.data-testid]="selectors.LIST">
+    @if (state.error()) {
+    <div class="noti-panel__error" [attr.data-testid]="selectors.ERROR">
+      <p>{{ messages.ERROR }}</p>
+      <p style="font-size: 12px; color: #666; margin-top: 8px">
+        {{ messages.ERROR_DETAIL }}{{ state.error() }}
+      </p>
+    </div>
+    } @else if (state.isLoading()) { @for (s of skeletonItems; track $index) {
+    <div class="noti-panel__skeleton-row">
+      <ex-skeleton
+        [loading]="true"
+        nzType="avatar"
+        [nzAvatar]="true"
+        [nzParagraph]="{ rows: 2 }"
+        [nzTitle]="false"
+      ></ex-skeleton>
+    </div>
+    } } @else if (state.items().length === 0) {
+    <div class="noti-panel__empty" [attr.data-testid]="selectors.EMPTY">
+      <p>
+        {{ state.activeTab() === 'unread' ? messages.EMPTY_UNREAD :
+        messages.EMPTY_ALL }}
+      </p>
+    </div>
+    } @else { @for (item of state.items(); track item.id) {
+    <app-notification-item
+      [item]="item"
+      (clicked)="onItemClicked($event)"
+    ></app-notification-item>
+    } }
+  </div>
+
+  <!-- Footer -->
+  <div class="noti-panel__footer">
+    <button
+      class="noti-panel__view-all"
+      [attr.data-testid]="selectors.VIEW_ALL_BTN"
+      (click)="onViewAll()"
+    >
+      {{ messages.VIEW_ALL }}
+    </button>
+  </div>
+</div>
+}

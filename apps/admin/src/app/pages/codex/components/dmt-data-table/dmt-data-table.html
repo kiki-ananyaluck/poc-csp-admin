@@ -1,0 +1,186 @@
+<ex-table
+  class="dmt__table"
+  [data]="data"
+  [total]="total"
+  [loading]="loading"
+  [showCustomPagination]="true"
+  customPaginationType="full"
+  [(pageIndex)]="pageIndex"
+  [pageSize]="pageSize"
+  [nzPageSizeOptions]="[10, 20, 50]"
+  [nzShowPagination]="false"
+  nzSize="middle"
+  (pageChange)="onPageChange($event)"
+  (nzPageSizeChange)="onPageSizeChange($event)"
+  (columnSortChange)="onColumnSort($event)"
+  (columnCheckedChange)="onAllCheckedFromTable($event)"
+>
+  <ex-column
+    key="checked"
+    title=""
+    width="48px"
+    [checkbox]="headerCheckboxConfig"
+    [checked]="checkedAll()"
+  >
+    <ng-template exCell let-row="row">
+      <ex-checkbox
+        [checked]="isChecked(row['id'])"
+        (checkedChange)="onCheckRow(row['id'], $event)"
+      ></ex-checkbox>
+    </ng-template>
+  </ex-column>
+
+  <ex-column
+    key="no"
+    title="{{ messages.COL_NO }}"
+    width="100px"
+    [sort]="{ show: false, fn: false }"
+  >
+    <ng-template exCell let-row="row">{{ row.no }}</ng-template>
+  </ex-column>
+
+  <ex-column
+    key="code"
+    [title]="messages.COL_CODE"
+    [sort]="{ show: true, fn: true }"
+    [(sortOrder)]="sortOrders['code']"
+  ></ex-column>
+
+  <ex-column
+    key="name"
+    [title]="messages.COL_NAME"
+    [sort]="{ show: true, fn: true }"
+    [(sortOrder)]="sortOrders['name']"
+  >
+    <ng-template exCell let-value>
+      <span class="dmt__cell-ellipsis" [nzTooltipTitle]="value" nz-tooltip
+        >{{ value }}</span
+      >
+    </ng-template>
+  </ex-column>
+
+  <ex-column
+    key="nameEn"
+    [title]="messages.COL_NAME_EN"
+    [sort]="{ show: true, fn: true }"
+    [(sortOrder)]="sortOrders['nameEn']"
+  >
+    <ng-template exCell let-value>
+      <span class="dmt__cell-ellipsis" [nzTooltipTitle]="value" nz-tooltip
+        >{{ value }}</span
+      >
+    </ng-template>
+  </ex-column>
+
+  <ex-column
+    key="status"
+    [title]="messages.COL_STATUS"
+    width="140px"
+    [sort]="{ show: true, fn: true }"
+    [(sortOrder)]="sortOrders['status']"
+  >
+    <ng-template exCell let-value>
+      @if (value === 'active') {
+      <ex-tag variant="success" icon="mark"
+        >{{ messages.STATUS_ACTIVE }}</ex-tag
+      >
+      } @else {
+      <ex-tag variant="default-light" icon="mark"
+        >{{ messages.STATUS_INACTIVE }}</ex-tag
+      >
+      }
+    </ng-template>
+  </ex-column>
+
+  <ex-column key="actions" title="" width="88px">
+    <ng-template exCell let-row="row">
+      <div class="dmt__col-actions">
+        <ex-icon-button
+          name="edit"
+          [size]="16"
+          [nzTooltipTitle]="messages.EDIT_TOOLTIP"
+          nz-tooltip
+          (clicked)="editClick.emit(row)"
+        ></ex-icon-button>
+        <span class="dmt__col-delete">
+          <ex-icon-button
+            name="delete"
+            [size]="16"
+            [nzTooltipTitle]="messages.DELETE_TOOLTIP"
+            nz-tooltip
+            (clicked)="onRowDeleteClick(row)"
+          ></ex-icon-button>
+        </span>
+      </div>
+    </ng-template>
+  </ex-column>
+</ex-table>
+
+<!-- Delete success toast -->
+@if (showDeleteSuccess()) {
+<div class="dmt__toast-wrap">
+  <ex-toast
+    variant="success"
+    [showCloseButton]="true"
+    [showConfirmButton]="false"
+    [autoDismiss]="true"
+    [autoDismissTime]="3000"
+    (dismiss)="onDismissDeleteSuccess()"
+  >
+    <p class="dmt__toast-message">{{ messages.DELETE_SUCCESS }}</p>
+  </ex-toast>
+</div>
+}
+
+<!-- Delete error toast -->
+@if (showDeleteError()) {
+<div class="dmt__toast-wrap">
+  <ex-toast
+    variant="error"
+    [showCloseButton]="true"
+    [showConfirmButton]="false"
+    [autoDismiss]="true"
+    [autoDismissTime]="4000"
+    (dismiss)="showDeleteError.set(false)"
+  >
+    <p class="dmt__toast-message">{{ messages.DELETE_ERROR }}</p>
+  </ex-toast>
+</div>
+}
+
+<!-- Selection bar -->
+<div class="dmt__selection-bar-wrap">
+  <div class="dmt__selection-bar">
+    <div class="dmt__selection-left">
+      <span class="dmt__selection-count-badge">{{ checkedIds().size }}</span>
+      <span class="dmt__selection-label">{{ messages.SELECTION_LABEL }}</span>
+    </div>
+    <div class="dmt__selection-divider"></div>
+    <ex-button
+      class="dmt__bulk-delete-btn"
+      variant="text"
+      size="small"
+      icon="delete"
+      [iconSize]="16"
+      [disabled]="checkedIds().size === 0"
+      (click)="onBulkDeleteClick()"
+      >{{ messages.BULK_DELETE_BUTTON }}</ex-button
+    >
+  </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<ex-modal
+  [isOpen]="isDeleteModalOpen()"
+  [title]="messages.DELETE_CONFIRM_TITLE"
+  [leftButton]="deleteModalCancelBtn"
+  [rightButton]="deleteModalConfirmBtn"
+  [rightButtonDisabled]="deleteIsLoading()"
+  (isOpenChange)="isDeleteModalOpen.set($any($event))"
+>
+  <div class="dmt__delete-modal">
+    <ex-icon name="danger" [size]="64" color="#FF4D4F"></ex-icon>
+    <h3 class="dmt__delete-modal-title">{{ messages.DELETE_CONFIRM_TITLE }}</h3>
+    <p class="dmt__delete-modal-desc">{{ messages.DELETE_CONFIRM_DESC }}</p>
+  </div>
+</ex-modal>

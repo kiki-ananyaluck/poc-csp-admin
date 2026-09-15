@@ -1,0 +1,99 @@
+.document-number-detail {
+  padding: 24px;
+
+  &__back {
+    margin-bottom: 12px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__error {
+    color: #b42318;
+    margin: 0 0 12px;
+  }
+
+  &__notice {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+
+    &--success {
+      border: 1px solid #86efac;
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    &--warning {
+      border: 1px solid #fcd34d;
+      background: #fefce8;
+      color: #854d0e;
+    }
+  }
+
+  &__card {
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 12px;
+    padding: 16px;
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin: 0;
+    }
+
+    dt {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    dd {
+      margin: 0;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+
+  &__modal-content {
+    p {
+      margin: 0 0 8px;
+      color: #374151;
+    }
+  }
+
+  &__toast-wrap {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    width: 360px;
+    max-width: calc(100vw - 40px);
+  }
+}

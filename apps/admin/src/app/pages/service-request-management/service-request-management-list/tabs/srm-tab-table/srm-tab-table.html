@@ -1,0 +1,507 @@
+<div class="srm-tab-content">
+  <!-- Search + Filter -->
+  <div class="srm-list__toolbar">
+    <ex-search-input
+      [placeholder]="messages.SEARCH_PLACEHOLDER"
+      [attr.data-testid]="selectors.SEARCH_INPUT"
+      (valueChange)="state.setSearch($event)"
+    ></ex-search-input>
+
+    <div class="srm-list__filter-container">
+      <ex-button
+        variant="neutral"
+        size="small"
+        icon="filter"
+        [iconSize]="16"
+        [attr.data-testid]="selectors.BTN_FILTER"
+        (click)="onToggleFilter()"
+      >
+        {{ messages.BTN_FILTER }}
+      </ex-button>
+
+      @if (state.filterOpen()) {
+      <div
+        class="srm-list__filter-backdrop"
+        (click)="state.closeFilter()"
+        (keydown.enter)="state.closeFilter()"
+        (keydown.space)="state.closeFilter()"
+        tabindex="0"
+      ></div>
+      <div
+        #filterPanel
+        class="srm-list__filter-panel"
+        [style.max-height.px]="filterPanelMaxHeight()"
+      >
+        <div class="srm-list__filter-header">
+          <span class="srm-list__filter-title"
+            >{{ messages.FILTER_PANEL_TITLE }}</span
+          >
+          <span
+            class="srm-list__filter-clear-link"
+            role="button"
+            tabindex="0"
+            (click)="state.clearDraft()"
+            (keydown.enter)="state.clearDraft()"
+            (keydown.space)="state.clearDraft()"
+          >
+            {{ messages.FILTER_CLEAR }}
+          </span>
+        </div>
+
+        <div class="srm-list__filter-body">
+          <!-- วันที่ยื่นใบสมัคร Section -->
+          <div class="srm-list__filter-section">
+            <p class="srm-list__filter-section-label">
+              {{ messages.FILTER_SECTION_SUBMIT_DATE }}
+            </p>
+            <div class="srm-list__filter-date-row">
+              <div class="srm-list__filter-date-field">
+                <app-thai-date-picker
+                  [label]="messages.FILTER_DATE_FROM"
+                  [placeholder]="messages.FILTER_DATE_FROM"
+                  [value]="state.getDraftDateFrom()"
+                  [dropdownClassName]="'srm-date-picker-dropdown'"
+                  (valueChange)="onDateFromChange($event)"
+                ></app-thai-date-picker>
+              </div>
+              <span class="srm-list__filter-date-separator">ถึง</span>
+              <div class="srm-list__filter-date-field">
+                <app-thai-date-picker
+                  [label]="messages.FILTER_DATE_TO"
+                  [placeholder]="messages.FILTER_DATE_TO"
+                  [value]="state.getDraftDateTo()"
+                  [dropdownClassName]="'srm-date-picker-dropdown'"
+                  (valueChange)="onDateToChange($event)"
+                ></app-thai-date-picker>
+              </div>
+            </div>
+          </div>
+
+          <div class="srm-list__filter-section">
+            <p class="srm-list__filter-section-label">
+              {{ messages.FILTER_SECTION_STATUS }}
+            </p>
+            @for (opt of statusOptions(); track opt.code) {
+            <ex-checkbox
+              [checked]="state.isDraftStatusChecked(opt.code)"
+              (checkedChange)="state.toggleDraftStatus(opt.code)"
+              >{{ getStatusLabel(opt.code) }}</ex-checkbox
+            >
+            }
+          </div>
+
+          <div class="srm-list__filter-section">
+            <p class="srm-list__filter-section-label">บริการ</p>
+            @for (service of serviceOptions(); track service.id) {
+            <ex-checkbox
+              [checked]="state.isDraftServiceChecked(service.id)"
+              (checkedChange)="state.toggleDraftService(service.id)"
+              >{{ service.appName }}</ex-checkbox
+            >
+            }
+          </div>
+        </div>
+
+        <div class="srm-list__filter-footer">
+          <ex-button variant="text" size="small" (click)="state.closeFilter()">
+            {{ messages.FILTER_BTN_CANCEL }}
+          </ex-button>
+          <ex-button
+            variant="primary"
+            size="small"
+            (click)="state.applyFilter()"
+          >
+            {{ messages.FILTER_BTN_APPLY }}
+          </ex-button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Result count + active filter chips -->
+  <div class="srm-list__result-row">
+    <div class="srm-list__filter-bar">
+      @if (state.activeStatuses().length || state.activeServiceIds().length ||
+      state.activeDateRange().from || state.activeDateRange().to) {
+      <span class="srm-list__filter-label">{{ messages.FILTER_BY }}</span>
+      @if (state.activeStatuses().length) {
+      <span class="srm-list__chip srm-list__chip--group">
+        <span class="srm-list__chip-label">{{ messages.COL_STATUS }}:</span>
+        <span>{{ getSelectedStatusLabels() }}</span>
+        <button
+          type="button"
+          class="srm-list__chip-close"
+          (click)="clearAppliedStatuses()"
+          aria-label="Remove"
+        >
+          ×
+        </button>
+      </span>
+      } @if (state.activeServiceIds().length) {
+      <span class="srm-list__chip srm-list__chip--group">
+        <span class="srm-list__chip-label">{{ messages.COL_SERVICE }}:</span>
+        <span>{{ getSelectedServiceLabels() }}</span>
+        <button
+          type="button"
+          class="srm-list__chip-close"
+          (click)="clearAppliedServices()"
+          aria-label="Remove"
+        >
+          ×
+        </button>
+      </span>
+      } @if (state.activeDateRange().from || state.activeDateRange().to) {
+      <span class="srm-list__chip">
+        {{ formatDateRangeLabel() }}
+        <button
+          type="button"
+          class="srm-list__chip-close"
+          (click)="clearDateFilter()"
+          aria-label="Remove"
+        >
+          ×
+        </button>
+      </span>
+      } }
+    </div>
+    <span class="srm-list__result-count">
+      {{ messages.RESULT_COUNT }}: <strong>{{ state.totalCount() }}</strong> {{
+      messages.RESULT_UNIT }}
+    </span>
+  </div>
+
+  <!-- Table -->
+  <ex-table
+    [data]="$any(state.rows())"
+    [total]="state.totalCount()"
+    [loading]="state.isLoading()"
+    [showCustomPagination]="true"
+    [customPaginationType]="'full'"
+    [pageIndex]="state.page()"
+    [pageSize]="state.pageSize()"
+    nzTableLayout="auto"
+    [nzScroll]="{ x: '1800px' }"
+    [scrollAfterRows]="12"
+    [nzNoResult]="emptyTpl"
+    [attr.data-testid]="selectors.TABLE"
+    (columnSortChange)="onColumnSort($event)"
+    (columnCheckedChange)="toggleSelectAll($event)"
+    (pageChange)="onPageChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)"
+  >
+    @if (showCheckbox()) {
+    <ex-column
+      key="_checkbox"
+      title=""
+      width="48px"
+      align="center"
+      [nzLeft]="true"
+      [checkbox]="headerCheckboxConfig"
+      [checked]="allSelected()"
+    >
+      <ng-template exCell let-row="row">
+        <ex-checkbox
+          [checked]="isRowSelected(row.id)"
+          (checkedChange)="toggleSelectRow(row.id, $event)"
+        ></ex-checkbox>
+      </ng-template>
+    </ex-column>
+    }
+
+    <ex-column
+      key="refNo"
+      [title]="messages.COL_REF_NO"
+      width="260px"
+      [nzLeft]="true"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value let-row="row">
+        <button class="srm-list__ref-link" (click)="navigateToDetail(row)">
+          {{ value }}
+        </button>
+      </ng-template>
+    </ex-column>
+
+    <ex-column
+      key="status"
+      [title]="messages.COL_STATUS"
+      width="220px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-row="row">
+        <ex-tag [variant]="getStatusDisplay(row.status).variant" size="small">
+          {{ row.statusDisplay }}
+        </ex-tag>
+      </ng-template>
+    </ex-column>
+
+    <ex-column
+      key="service"
+      [title]="messages.COL_SERVICE"
+      width="180px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>
+        @if (value) {
+        <div
+          class="srm-tab-table__cell-ellipsis"
+          [nzTooltipTitle]="value"
+          nz-tooltip
+        >
+          <ex-tag variant="default" size="small">{{ value }}</ex-tag>
+        </div>
+        } @else {
+        <span>-</span>
+        }
+      </ng-template>
+    </ex-column>
+
+    <ex-column
+      key="company"
+      [title]="messages.COL_COMPANY"
+      width="300px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>
+        <div
+          class="srm-tab-table__cell-ellipsis"
+          [nzTooltipTitle]="displayValue(value)"
+          nz-tooltip
+        >
+          {{ displayValue(value) }}
+        </div>
+      </ng-template>
+    </ex-column>
+
+    <ex-column
+      key="submitDate"
+      [title]="messages.COL_SUBMIT_DATE"
+      width="220px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>{{ displayValue(value) }}</ng-template>
+    </ex-column>
+
+    <ex-column
+      key="assignee"
+      [title]="messages.COL_ASSIGNEE"
+      width="180px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>
+        <div
+          class="srm-tab-table__cell-ellipsis"
+          [nzTooltipTitle]="displayValue(value)"
+          nz-tooltip
+        >
+          {{ displayValue(value) }}
+        </div>
+      </ng-template>
+    </ex-column>
+
+    <ex-column
+      key="receivedDate"
+      [title]="messages.COL_RECEIVED_DATE"
+      width="220px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>{{ displayValue(value) }}</ng-template>
+    </ex-column>
+
+    <ex-column
+      key="lastOperator"
+      [title]="messages.COL_LAST_OPERATOR"
+      width="180px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>
+        <div
+          class="srm-tab-table__cell-ellipsis"
+          [nzTooltipTitle]="displayValue(value)"
+          nz-tooltip
+        >
+          {{ displayValue(value) }}
+        </div>
+      </ng-template>
+    </ex-column>
+
+    <ex-column
+      key="lastOperatedDate"
+      [title]="messages.COL_LAST_OPERATED_DATE"
+      width="220px"
+      [sort]="{ show: true, fn: true }"
+    >
+      <ng-template exCell let-value>{{ displayValue(value) }}</ng-template>
+    </ex-column>
+  </ex-table>
+</div>
+
+@if (showCheckbox()) {
+<div class="srm-action-bar__wrapper">
+  <div class="srm-action-bar">
+    <div class="srm-action-bar__left">
+      <span class="srm-action-bar__badge">{{ selectedIds().size }}</span>
+      <span class="srm-action-bar__label">ใบสมัครที่เลือกอยู่</span>
+    </div>
+    <div class="srm-action-bar__divider"></div>
+    <div class="srm-action-bar__actions">
+      <ex-button
+        variant="neutral"
+        size="small"
+        [icon]="computedActionIcon()"
+        [iconSize]="16"
+        [disabled]="selectedIds().size === 0 || isActionLoading()"
+        (click)="onActionClick()"
+        >{{ actionLabel() }}</ex-button
+      >
+    </div>
+  </div>
+</div>
+}
+
+<div class="srm-toast-floating">
+  <ex-toast
+    [visible]="showToast()"
+    [autoDismiss]="true"
+    [autoDismissTime]="5000"
+    [variant]="toastVariant()"
+    [showConfirmButton]="false"
+    [showCloseButton]="true"
+    (dismiss)="dismissToast()"
+  >
+    {{ toastMessage() }}
+  </ex-toast>
+</div>
+
+<!-- Empty state templates -->
+<ng-template #emptyTpl>
+  @if (isFiltering) {
+  <div class="srm-empty-state">
+    <ex-icon name="search" [size]="48" class="srm-empty-state__icon"></ex-icon>
+    <p class="srm-empty-state__title">{{ messages.EMPTY_NO_RESULT_TITLE }}</p>
+    <p class="srm-empty-state__desc">{{ messages.EMPTY_NO_RESULT_DESC }}</p>
+  </div>
+  } @else {
+  <div class="srm-empty-state">
+    <ex-icon name="paper" [size]="48" class="srm-empty-state__icon"></ex-icon>
+    <p class="srm-empty-state__title">{{ messages.EMPTY_NO_DATA_TITLE }}</p>
+    <p class="srm-empty-state__desc">{{ messages.EMPTY_NO_DATA_DESC }}</p>
+  </div>
+  }
+</ng-template>
+
+<!-- Reassign modal -->
+<ex-modal-input
+  [isOpen]="reassignModalOpen()"
+  title="ย้ายผู้รับผิดชอบ"
+  width="560px"
+  [showTopDivider]="true"
+  [showCloseButton]="true"
+  [closeOnBackdrop]="false"
+  [leftButton]="reassignCancelButton"
+  [rightButton]="reassignConfirmButton"
+  (closed)="closeReassignModal()"
+>
+  <div class="srm-assignee-field">
+    <div class="srm-assignee-field__top-label">
+      ชื่อผู้รับผิดชอบ <span class="srm-assignee-field__required">*</span>
+    </div>
+
+    <div
+      class="srm-custom-select"
+      [class.srm-custom-select--open]="assigneeDropdownOpen()"
+    >
+      @if (assigneeDropdownOpen()) {
+      <div
+        class="srm-custom-select__backdrop"
+        tabindex="0"
+        role="button"
+        aria-label="Close dropdown"
+        (click)="toggleAssigneeDropdown()"
+        (keydown.enter)="toggleAssigneeDropdown()"
+        (keydown.space)="toggleAssigneeDropdown()"
+      ></div>
+      }
+
+      <button
+        #assigneeTrigger
+        type="button"
+        class="srm-custom-select__trigger"
+        (click)="toggleAssigneeDropdown()"
+      >
+        @if (selectedAssignee) {
+        <div class="srm-assignee-option">
+          <span class="srm-assignee-option__name"
+            >{{ selectedAssignee.name }}</span
+          >
+          <span class="srm-assignee-option__position"
+            >{{ selectedAssignee.position }}</span
+          >
+          <span class="srm-assignee-option__department"
+            >{{ selectedAssignee.department }}</span
+          >
+        </div>
+        } @else {
+        <span class="srm-custom-select__placeholder"
+          >กรุณาเลือกชื่อผู้รับผิดชอบ</span
+        >
+        }
+        <span class="srm-custom-select__arrow">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M11.9999 16.9139L3.58594 8.49994L4.99994 7.08594L11.9999 14.0859L18.9999 7.08594L20.4139 8.49994L11.9999 16.9139Z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</ex-modal-input>
+
+@if (assigneeDropdownOpen() && assigneePanelRect()) {
+<div
+  class="srm-custom-select__panel"
+  [style.position]="'fixed'"
+  [style.top.px]="assigneePanelRect()!.top"
+  [style.left.px]="assigneePanelRect()!.left"
+  [style.width.px]="assigneePanelRect()!.width"
+>
+  <div class="srm-custom-select__search">
+    <ex-search-input
+      placeholder="ค้นหาชื่อ..."
+      (valueChange)="assigneeSearchQuery.set($event)"
+    ></ex-search-input>
+  </div>
+  @if (filteredAssigneeOptions().length === 0) {
+  <div class="srm-custom-select__empty">ไม่พบข้อมูล</div>
+  }
+  <div class="srm-custom-select__options">
+    @for (opt of filteredAssigneeOptions(); track opt.value) {
+    <button
+      type="button"
+      class="srm-custom-select__option"
+      [class.srm-custom-select__option--active]="reassigneeId === opt.value"
+      (click)="selectAssignee(opt)"
+    >
+      <div class="srm-assignee-option">
+        <span class="srm-assignee-option__name">{{ opt.name }}</span>
+        <span class="srm-assignee-option__position">{{ opt.position }}</span>
+        <span class="srm-assignee-option__department"
+          >{{ opt.department }}</span
+        >
+      </div>
+    </button>
+    }
+  </div>
+</div>
+}

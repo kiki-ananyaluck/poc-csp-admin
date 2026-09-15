@@ -1,0 +1,159 @@
+<ex-table
+  class="status-table__table"
+  [data]="state.rows()"
+  [total]="state.totalCount()"
+  [loading]="state.loading()"
+  [showCustomPagination]="true"
+  customPaginationType="full"
+  [(pageIndex)]="pageIndex"
+  [pageSize]="state.pageSize()"
+  [nzPageSizeOptions]="[10, 20, 50]"
+  [nzShowPagination]="false"
+  nzSize="middle"
+  (pageChange)="onPageChange($event)"
+  (columnCheckedChange)="onAllChecked($any($event).value)"
+>
+  <!-- Checkbox column -->
+  <ex-column
+    key="checked"
+    title=""
+    width="48px"
+    [checkbox]="{ indeterminate: false }"
+    [checked]="state.isAllChecked()"
+  >
+    <ng-template exCell let-row="row">
+      <ex-checkbox
+        [checked]="state.isChecked(row['id'])"
+        (checkedChange)="state.toggleCheck(row['id'])"
+      ></ex-checkbox>
+    </ng-template>
+  </ex-column>
+
+  <!-- App name column -->
+  <ex-column key="name" [title]="messages.COL_NAME">
+    <ng-template exCell let-row="row">
+      <div class="status-table__app-cell">
+        <div class="status-table__app-icon">
+          <span class="status-table__app-icon-dots"></span>
+        </div>
+        <div class="status-table__app-info">
+          <span class="status-table__app-name">{{ row['name'] }}</span>
+          <span class="status-table__app-version"
+            >ver {{ row['version'] }}</span
+          >
+        </div>
+      </div>
+    </ng-template>
+  </ex-column>
+
+  <!-- Status column -->
+  <ex-column key="status" [title]="messages.COL_STATUS" width="200px">
+    <ng-template exCell let-row="row">
+      @if (row['status'] === 'active') {
+      <ex-tag variant="success" icon="mark"
+        >{{ messages.STATUS_ACTIVE }}</ex-tag
+      >
+      } @else if (row['status'] === 'maintenance') {
+      <ex-tag variant="warning" icon="mark"
+        >{{ messages.STATUS_MAINTENANCE }}</ex-tag
+      >
+      } @else {
+      <ex-tag variant="default-light" icon="mark"
+        >{{ messages.STATUS_INACTIVE }}</ex-tag
+      >
+      }
+    </ng-template>
+  </ex-column>
+
+  <!-- Description column -->
+  <ex-column
+    key="description"
+    [title]="messages.COL_DESCRIPTION"
+    width="300px"
+  >
+    <ng-template exCell let-row="row">
+      <div class="status-table__desc-cell">
+        <span class="status-table__desc-text"
+          >{{ row['description'] || '-' }}</span
+        >
+        @if (row['status'] === 'maintenance') {
+        <ex-icon-button
+          name="edit"
+          [size]="16"
+          nz-tooltip
+          nzTooltipTitle="แก้ไขรายละเอียด"
+          (clicked)="onManageStatusClick(row)"
+        ></ex-icon-button>
+        }
+      </div>
+    </ng-template>
+  </ex-column>
+
+  <!-- Action column -->
+  <ex-column key="action" title="" width="148px">
+    <ng-template exCell let-row="row">
+      <ex-button
+        variant="neutral"
+        size="small"
+        (click)="onManageStatusClick(row)"
+      >
+        {{ messages.BTN_MANAGE_STATUS }}
+      </ex-button>
+    </ng-template>
+  </ex-column>
+</ex-table>
+
+<!-- Selection bar -->
+<div class="status-table__selection-bar-wrap">
+  @if (state.showSuccessToast()) {
+  <div class="status-table__toast-wrap">
+    <ex-toast
+      [variant]="state.toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="state.dismissToast()"
+      >{{ state.toastMessage() }}</ex-toast
+    >
+  </div>
+  }
+  <div class="status-table__selection-bar">
+    <div class="status-table__selection-left">
+      <span class="status-table__selection-badge"
+        >{{ state.checkedIds().size }}</span
+      >
+      <span class="status-table__selection-label"
+        >{{ messages.SELECTION_LABEL }}</span
+      >
+    </div>
+    <div class="status-table__selection-divider"></div>
+    <button
+      type="button"
+      class="status-table__bulk-btn"
+      [disabled]="state.checkedIds().size === 0"
+      (click)="onBulkActive()"
+    >
+      <span class="status-table__dot status-table__dot--active"></span>
+      {{ messages.BULK_SET_ACTIVE }}
+    </button>
+    <button
+      type="button"
+      class="status-table__bulk-btn"
+      [disabled]="state.checkedIds().size === 0"
+      (click)="onBulkMaintenance()"
+    >
+      <span class="status-table__dot status-table__dot--maintenance"></span>
+      {{ messages.BULK_SET_MAINTENANCE }}
+    </button>
+    <button
+      type="button"
+      class="status-table__bulk-btn"
+      [disabled]="state.checkedIds().size === 0"
+      (click)="onBulkInactive()"
+    >
+      <span class="status-table__dot status-table__dot--inactive"></span>
+      {{ messages.BULK_SET_INACTIVE }}
+    </button>
+  </div>
+</div>

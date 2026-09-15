@@ -1,0 +1,126 @@
+<div class="workflow-builder">
+  @for (node of flatNodes; track node.id; let i = $index) {
+    @if (node.level === 0) {
+      @if (i > 0) {
+        <div class="workflow-builder__connector">
+          <div class="workflow-builder__connector-line"></div>
+          <ex-icon-button
+            class="workflow-builder__add-btn"
+            name="add"
+            variant="ghost"
+            (clicked)="openPicker(flatNodes[i - 1]?.id || '')"
+          ></ex-icon-button>
+
+          @if (pickerAnchorId === (flatNodes[i - 1]?.id || '')) {
+            <app-action-picker
+              [anchorId]="pickerAnchorId"
+              [isInsideParallel]="false"
+              (actionSelected)="onPickerAction($event, pickerAnchorId)"
+              (closed)="closePicker()"
+            />
+          }
+        </div>
+      }
+
+      <div class="workflow-builder__node" [class]="getNodeColorClass(node.type)">
+        <div
+          class="workflow-builder__node-header"
+          role="button"
+          tabindex="0"
+          (click)="toggleExpand(node.id)"
+          (keydown.enter)="toggleExpand(node.id)"
+          (keydown.space)="toggleExpand(node.id); $event.preventDefault()"
+        >
+          <div class="workflow-builder__node-heading">
+            <span class="wts__phase-order">{{ getNodeLabel(node) }}</span>
+            <div class="workflow-builder__node-copy">
+              <span class="workflow-builder__node-name">{{ node.name }}</span>
+              @if (node.type !== 'trigger') {
+                <span class="workflow-builder__node-subtitle">
+                  {{ messages.OPEN_EDITOR }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <div class="workflow-builder__node-tools">
+            @if (node.type !== 'trigger') {
+              <ex-button
+                variant="error"
+                size="small"
+                icon="delete"
+                [iconSize]="16"
+                (click)="deleteNode(node.id); $event.stopPropagation()"
+              >
+                {{ messages.IN_NODE_DELETE_BUTTON }}
+              </ex-button>
+            }
+          </div>
+        </div>
+
+        @if (node.type === 'parallel' && expandedNodeId === node.id) {
+          <div class="workflow-builder__parallel-branches">
+            @for (child of getParallelChildren(node.id); track child.id) {
+              <div class="workflow-builder__branch">
+                <div class="workflow-builder__branch-header">
+                  <div class="workflow-builder__branch-copy">
+                    <span class="workflow-builder__node-name">{{ child.name }}</span>
+                  </div>
+
+                  @if (getParallelChildren(node.id).length > 2) {
+                    <ex-button
+                      variant="error"
+                      size="small"
+                      icon="delete"
+                      [iconSize]="16"
+                      (click)="deleteNode(child.id); $event.stopPropagation()"
+                    >
+                      {{ messages.IN_NODE_DELETE_BUTTON }}
+                    </ex-button>
+                  }
+                </div>
+
+                <app-step-editor [nodeId]="child.id" [data]="child.data" />
+              </div>
+            }
+
+            <div class="workflow-builder__branch-action">
+              <ex-button
+                variant="outline"
+                size="small"
+                icon="add"
+                [iconSize]="16"
+                (click)="onPickerAction('branch', node.id)"
+              >
+                {{ messages.IN_NODE_ADD_PARALLEL_STEP_BUTTON }}
+              </ex-button>
+            </div>
+          </div>
+        }
+
+        @if (node.type === 'action' && expandedNodeId === node.id) {
+          <app-step-editor [nodeId]="node.id" [data]="node.data" />
+        }
+      </div>
+    }
+  }
+
+  <div class="workflow-builder__connector">
+    <div class="workflow-builder__connector-line"></div>
+    <ex-icon-button
+      class="workflow-builder__add-btn"
+      name="add"
+      variant="ghost"
+      (clicked)="openPicker(flatNodes[flatNodes.length - 1]?.id || '')"
+    ></ex-icon-button>
+
+    @if (pickerAnchorId === (flatNodes[flatNodes.length - 1]?.id || '') && flatNodes.length > 0) {
+      <app-action-picker
+        [anchorId]="pickerAnchorId"
+        [isInsideParallel]="false"
+        (actionSelected)="onPickerAction($event, pickerAnchorId)"
+        (closed)="closePicker()"
+      />
+    }
+  </div>
+</div>

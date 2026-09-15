@@ -1,0 +1,230 @@
+<div
+  class="term-create"
+  [class.term-create--version]="isVersionMode()"
+  [attr.data-testid]="selectors.HOST"
+>
+  <ex-spinning [spinning]="state.isLoading() || state.isSaving()">
+    <!-- Breadcrumb -->
+    <app-term-breadcrumb
+      [items]="breadcrumbItems"
+      [testId]="selectors.BREADCRUMB"
+    ></app-term-breadcrumb>
+
+    @if (isVersionMode()) {
+    <div class="term-create__header">
+      <div class="term-create__header-left">
+        <div class="term-create__title-row">
+          <h1 class="term-create__title">
+            <span class="term-create__title-main">{{ titleLabel }}</span>
+            <button
+              type="button"
+              class="term-create__title-edit-btn term-create__title-edit-btn--inline"
+              (click)="openTitleModal()"
+              [attr.aria-label]="messages.TITLE_EDIT_BTN"
+            >
+              <ex-icon name="edit" [size]="20" color="#000000"></ex-icon>
+            </button>
+            <span class="term-create__title-version"
+              >&bull;&nbsp;{{ state.nextVersion() }}</span
+            >
+          </h1>
+          <ex-tag class="term-create__version-badge" variant="info"
+            >{{ messages.VERSION_BADGE }}</ex-tag
+          >
+        </div>
+        <span class="term-create__code"
+          >{{ messages.LABEL_CODE }}: {{ state.documentCode() }}</span
+        >
+      </div>
+    </div>
+
+    @if (state.sourceVersion()) {
+    <div class="term-create__copy-banner">
+      <span class="term-create__copy-banner-text">
+        {{ messages.COPY_FROM_PREFIX }}
+        <strong>{{ state.sourceVersion() }}</strong>
+      </span>
+      <button
+        type="button"
+        class="term-create__start-blank-link"
+        (click)="onStartBlank()"
+      >
+        {{ messages.BTN_START_BLANK }}
+      </button>
+    </div>
+    } } @else {
+    <!-- Header -->
+    <div class="term-create__header">
+      <div class="term-create__title-edit-row">
+        <h1 class="term-create__title">{{ titleLabel }}</h1>
+        <button
+          type="button"
+          class="term-create__title-edit-btn"
+          (click)="openTitleModal()"
+          [attr.aria-label]="messages.TITLE_EDIT_BTN"
+        >
+          <ex-icon name="edit" [size]="20" color="#000000"></ex-icon>
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- Fields (rows mode: 180px | 1fr asymmetric grid) -->
+    @if (isVersionMode()) {
+    <div class="term-create__change-type">
+      <ex-dropdown
+        [label]="messages.CHANGE_TYPE_LABEL"
+        [labelMode]="'top'"
+        [ngModel]="state.changeType()"
+        (ngModelChange)="onChangeTypeChange($event)"
+        [options]="changeTypeOptions"
+      ></ex-dropdown>
+    </div>
+    <div class="term-create__version-fields">
+      <ex-dropdown
+        [label]="messages.FIELD_CONDITION_TYPE"
+        [labelMode]="'top'"
+        [ngModel]="state.form().conditionType"
+        [disabled]="true"
+        [required]="true"
+        [options]="[
+          { value: 'MANDATORY', label: messages.CONDITION_TYPE_MANDATORY },
+          { value: 'OPTIONAL', label: messages.CONDITION_TYPE_OPTIONAL }
+        ]"
+      ></ex-dropdown>
+
+      <ex-text-input
+        [label]="messages.FIELD_CONDITION_TITLE"
+        [labelMode]="'top'"
+        [required]="true"
+        [placeholder]="messages.FIELD_CONDITION_TITLE_PLACEHOLDER"
+        [ngModel]="state.form().conditionTitle"
+        (ngModelChange)="onVersionConditionTitleChange($event)"
+      ></ex-text-input>
+    </div>
+    } @else if (showDynamicForm()) {
+    <ex-dynamic-form
+      [config]="formConfig()"
+      [externalErrors]="dynamicFormExternalErrors()"
+      (valueChange)="onFormValueChange($event)"
+    ></ex-dynamic-form>
+    }
+
+    <!-- รายละเอียดของข้อกำหนดและเงื่อนไข (custom section ที่ dynamic-form ทำไม่ได้) -->
+    <div class="term-create__content-section">
+      <div class="term-create__content-header">
+        <div class="term-create__content-label-wrap">
+          <span class="term-create__content-label"
+            >{{ messages.FIELD_CONTENT }}<span
+              class="term-create__required-star"
+              >*</span
+            ></span
+          >
+        </div>
+        <ex-button
+          class="term-create__preview-trigger"
+          variant="outline"
+          size="small"
+          icon="show"
+          (click)="openPreviewModal()"
+        >
+          {{ messages.BTN_PREVIEW }}
+        </ex-button>
+      </div>
+      <ex-text-editor
+        [placeholder]="messages.FIELD_CONTENT_PLACEHOLDER"
+        [required]="true"
+        [error]="showContentError()"
+        [height]="'240px'"
+        format="html"
+        [(ngModel)]="content"
+        (editorCreated)="onEditorCreated($event)"
+        [attr.data-testid]="selectors.FIELD_CONTENT"
+      ></ex-text-editor>
+    </div>
+
+    <!-- Footer -->
+    <div class="term-create__footer">
+      <span class="term-create__footer-note">{{ messages.FOOTER_NOTE }}</span>
+      <ex-button
+        variant="primary"
+        size="small"
+        icon="save"
+        [disabled]="state.isSaving()"
+        [attr.data-testid]="selectors.BTN_SAVE"
+        (click)="save()"
+      >
+        {{ messages.BTN_SAVE }}
+      </ex-button>
+    </div>
+  </ex-spinning>
+
+  @if (state.showToast()) {
+  <div class="term-create__toast-wrap">
+    <ex-toast
+      [variant]="state.toastVariant()"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showConfirmButton]="false"
+      [showCloseButton]="true"
+      (dismiss)="state.dismissToast()"
+      >{{ state.toastMessage() }}</ex-toast
+    >
+  </div>
+  }
+</div>
+
+@if (isVersionMode() && state.showConfirmClearDialog()) {
+<ex-modal
+  [isOpen]="true"
+  [leftButton]="cancelClearButton"
+  [rightButton]="confirmClearButton"
+  (closed)="state.closeConfirmClearDialog()"
+>
+  <div class="term-create__clear-modal">
+    <div class="term-create__clear-modal-icon-wrap">
+      <ex-icon name="document" [size]="50" color="#2f66b0"></ex-icon>
+    </div>
+    <h3 class="term-create__clear-modal-title">{{ messages.MODAL_TITLE }}</h3>
+    <p class="term-create__clear-modal-description">
+      {{ messages.MODAL_BODY }}
+    </p>
+  </div>
+</ex-modal>
+} @if (isTitleModalOpen()) {
+<ex-modal-input
+  [isOpen]="true"
+  [title]="messages.TITLE_MODAL_TITLE"
+  [width]="'560px'"
+  [closeOnBackdrop]="false"
+  [showTopDivider]="true"
+  [showCloseButton]="true"
+  [leftButton]="titleModalCancelButton"
+  [rightButton]="titleModalSaveButton"
+  (closed)="closeTitleModal()"
+>
+  <div class="term-create__title-modal">
+    <input
+      class="term-create__title-modal-input"
+      type="text"
+      [value]="titleDraft()"
+      (input)="titleDraft.set($any($event.target).value)"
+      [placeholder]="messages.DEFAULT_TITLE_LABEL"
+      maxlength="100"
+    />
+  </div>
+</ex-modal-input>
+} @if (isPreviewModalOpen()) {
+<app-consent-modal
+  [consentData]="previewConsentData()"
+  [isLoading]="false"
+  [showBackArrow]="hidePreviewBackArrow"
+  [showBackButton]="false"
+  [showPrimaryButton]="false"
+  [showCloseButton]="true"
+  [lastStepLabel]="messages.PREVIEW_MODAL_CLOSE"
+  [modalTitle]="previewModalTitle"
+  (consentSubmit)="onPreviewConsentSubmit($event)"
+  (consentClose)="closePreviewModal()"
+/>
+}

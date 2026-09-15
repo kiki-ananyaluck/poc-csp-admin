@@ -1,0 +1,25 @@
+<ex-layout
+  [menuItems]="menuItems()"
+  [bottomMenuItems]="bottomMenuItems"
+  [showSearch]="false"
+  [showCorporatePanel]="false"
+  [userName]="userName()"
+  [userEmail]="userEmail()"
+  [avatarUrl]="avatarUrl()"
+  [userMenuItems]="userMenuItems"
+  [unreadCount]="unreadCount()"
+  [notifications]="notifications()"
+  [notificationsLoading]="notificationsLoading()"
+  [activeNotificationTab]="activeNotificationTab()"
+  (menuAction)="onMenuAction($event)"
+  (bellClick)="onBellClick()"
+  (notificationTabChange)="onNotificationTabChange($event)"
+  (notificationItemClick)="onNotificationItemClick($event)"
+  (notificationMarkAllRead)="onNotificationMarkAllRead()"
+  (notificationViewAll)="onNotificationViewAll()"
+  (userMenuAction)="onUserMenuAction($event)"
+>
+  <router-outlet></router-outlet>
+</ex-layout>
+
+<app-logout-confirm-modal></app-logout-confirm-modal>

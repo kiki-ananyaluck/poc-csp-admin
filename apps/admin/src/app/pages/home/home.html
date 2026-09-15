@@ -1,0 +1,35 @@
+<div class="home" [attr.data-testid]="selectors.CONTAINER">
+
+  <!-- Greeting Banner -->
+  <div class="home__banner" [attr.data-testid]="selectors.BANNER">
+    <h1 class="home__banner-title" [attr.data-testid]="selectors.TITLE">
+      {{ messages.GREETING_PREFIX }}{{ userName() }}
+    </h1>
+    <p class="home__banner-subtitle" [attr.data-testid]="selectors.SUBTITLE">
+      {{ messages.GREETING_SUBTITLE }}
+    </p>
+  </div>
+
+  <!-- Menu Section -->
+  <div class="home__menu" [attr.data-testid]="selectors.MENU_SECTION">
+    <h2 class="home__menu-title">{{ messages.MENU_SECTION_TITLE }}</h2>
+
+    <div class="home__menu-grid" [attr.data-testid]="selectors.MENU_GRID">
+      @for (item of menuItems; track item.iconId + item.label) {
+        <button
+          class="home__menu-card"
+          [class.home__menu-card--disabled]="item.disabled"
+          [disabled]="item.disabled"
+          (click)="navigateTo(item)"
+          [attr.data-testid]="selectors.MENU_CARD + '-' + item.iconId"
+        >
+          <span class="home__menu-card-icon">
+            <ex-icon [name]="item.iconId" [size]="36"></ex-icon>
+          </span>
+          <span class="home__menu-card-label">{{ item.label }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+</div>

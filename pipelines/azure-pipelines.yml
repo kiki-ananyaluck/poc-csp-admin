@@ -1,0 +1,202 @@
+trigger:
+  branches:
+    include:
+      - development
+      - sit
+      - uat
+
+pr: none
+
+parameters:
+  - name: buildConfiguration
+    displayName: 'Build Configuration'
+    type: string
+    default: 'sit'
+    values:
+      - development
+      - sit
+      - uat
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - name: NODE_VERSION
+    value: '22.x'
+  - name: PNPM_VERSION
+    value: '10.33.0'
+  - name: BUILD_OUTPUT_PATH
+    value: 'dist/apps/admin/browser'
+  - name: NPM_CONFIG_FILE
+    value: '$(Build.SourcesDirectory)/.npmrc'
+  - name: EXIM_NPM_REGISTRY
+    value: 'https://pkgs.dev.azure.com/eximth/_packaging/eximth/npm/registry/'
+
+  # Environment selection — resolved at compile time from the triggering branch.
+  # Exactly one block wins (branch conditions are mutually exclusive), so exactly
+  # one variable group loads and the same-named vars across groups never collide.
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/development') }}:
+      - group: Frontend_AdminSuperApp_DEV
+      - name: BUILD_SCRIPT
+        value: 'pnpm nx build admin --configuration=development --skip-nx-cache'
+      - name: ENV_NAME
+        value: 'development'
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/sit') }}:
+      - group: Frontend_AdminSuperApp_SIT
+      - name: BUILD_SCRIPT
+        value: 'pnpm nx build admin --configuration=sit --skip-nx-cache'
+      - name: ENV_NAME
+        value: 'sit'
+  - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/uat') }}:
+      - group: Frontend_AdminSuperApp_UAT
+      - name: BUILD_SCRIPT
+        value: 'pnpm nx build admin --configuration=uat --skip-nx-cache'
+      - name: ENV_NAME
+        value: 'uat'
+
+steps:
+  # Guard: if the triggering branch is none of development/sit/uat, no env block
+  # was selected — no group, no BUILD_SCRIPT. Fail fast at compile time rather
+  # than dying mid-deploy on undefined storage variables. Must be compile-time:
+  # an undefined macro renders as the literal '$(BUILD_SCRIPT)', never '', so a
+  # runtime empty-check would not fire reliably.
+  - ${{ if not(or(eq(variables['Build.SourceBranch'], 'refs/heads/development'), eq(variables['Build.SourceBranch'], 'refs/heads/sit'), eq(variables['Build.SourceBranch'], 'refs/heads/uat'))) }}:
+      - script: |
+          echo "##vso[task.logissue type=error]Unmapped branch $(Build.SourceBranch); this pipeline supports development/sit/uat only."
+          exit 1
+        displayName: 'Guard: unmapped branch'
+
+  - checkout: self
+    fetchDepth: '1'
+
+  - script: |
+      echo "##vso[task.setvariable variable=NX_CONFIGURATION]${{ parameters.buildConfiguration }}"
+      echo "Build configuration: ${{ parameters.buildConfiguration }}"
+    displayName: 'Set build configuration'
+
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '$(NODE_VERSION)'
+    displayName: 'Install Node.js $(NODE_VERSION)'
+
+  - script: |
+      corepack enable
+      corepack prepare pnpm@$(PNPM_VERSION) --activate
+      pnpm config set store-dir $(Pipeline.Workspace)/.pnpm-store
+    displayName: 'Install pnpm $(PNPM_VERSION)'
+
+  - task: Cache@2
+    displayName: 'Cache pnpm store'
+    inputs:
+      key: 'pnpm | "$(Agent.OS)" | package.json'
+      path: '$(Pipeline.Workspace)/.pnpm-store'
+      restoreKeys: |
+        pnpm | "$(Agent.OS)"
+
+  - script: |
+      set -euo pipefail
+      {
+        printf '%s\n' "@exim:registry=$(EXIM_NPM_REGISTRY)"
+        printf '%s\n' 'always-auth=true'
+        printf '%s\n' 'registry=https://registry.npmjs.org/'
+      } > '$(NPM_CONFIG_FILE)'
+    displayName: 'Prepare npm registry config'
+
+  - task: npmAuthenticate@0
+    displayName: 'Authenticate Azure Artifacts feed'
+    inputs:
+      workingFile: '$(NPM_CONFIG_FILE)'
+
+  - script: |
+      set -euo pipefail
+      pnpm store prune
+      pnpm install --frozen-lockfile
+    displayName: 'Install dependencies'
+    env:
+      NPM_CONFIG_USERCONFIG: '$(NPM_CONFIG_FILE)'
+
+  - script: $(BUILD_SCRIPT)
+    displayName: 'Build admin ($(ENV_NAME))'
+
+  - script: |
+      set -euo pipefail
+      build_output='$(Build.SourcesDirectory)/$(BUILD_OUTPUT_PATH)'
+      if [ ! -f "$build_output/index.html" ]; then
+        echo "##vso[task.logissue type=error]Build output not found at $build_output"
+        exit 1
+      fi
+    displayName: 'Validate build output'
+
+  - task: AzureCLI@2
+    displayName: 'Clear Azure Blob Storage ($web)'
+    inputs:
+      azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        az storage blob delete-batch \
+          --account-name '$(AZURE_STORAGE_ACCOUNT)' \
+          --source '$(AZURE_STORAGE_CONTAINER)' \
+          --auth-mode login \
+          --only-show-errors
+
+  - task: AzureCLI@2
+    displayName: 'Deploy to Azure Blob Storage ($web)'
+    inputs:
+      azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        az storage blob upload-batch \
+          --account-name '$(AZURE_STORAGE_ACCOUNT)' \
+          --destination '$(AZURE_STORAGE_CONTAINER)' \
+          --source '$(Build.SourcesDirectory)/$(BUILD_OUTPUT_PATH)' \
+          --auth-mode login \
+          --overwrite true \
+          --only-show-errors
+
+  - task: AzureCLI@2
+    displayName: 'Set Cache-Control headers'
+    inputs:
+      azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        set_cache() {
+          local ext="$1"
+          local cache_value="$2"
+          az storage blob list \
+            --account-name '$(AZURE_STORAGE_ACCOUNT)' \
+            --container-name '$(AZURE_STORAGE_CONTAINER)' \
+            --auth-mode login \
+            --query "[?ends_with(name, '.$ext')].name" \
+            --output tsv \
+          | while IFS= read -r blob; do
+              az storage blob update \
+                --account-name '$(AZURE_STORAGE_ACCOUNT)' \
+                --container-name '$(AZURE_STORAGE_CONTAINER)' \
+                --name "$blob" \
+                --content-cache-control "$cache_value" \
+                --auth-mode login \
+                --only-show-errors
+            done
+        }
+        # no-cache: always re-validate
+        for ext in html json; do
+          set_cache "$ext" 'no-cache'
+        done
+        # immutable: content-hashed files, safe to cache forever
+        for ext in js css map; do
+          set_cache "$ext" 'public, max-age=31536000, immutable'
+        done
+        # 1-day cache: assets without content hashing
+        for ext in png jpg jpeg ico svg webp gif woff woff2 ttf eot; do
+          set_cache "$ext" 'public, max-age=86400'
+        done
+
+  - script: rm -f '$(NPM_CONFIG_FILE)'
+    displayName: 'Cleanup npm auth'
+    condition: always()

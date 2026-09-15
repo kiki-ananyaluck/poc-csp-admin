@@ -1,0 +1,131 @@
+<div class="term-version-detail" [attr.data-testid]="selectors.HOST">
+  <ex-spinning [spinning]="state.isLoading()">
+    @if (state.detail(); as detail) {
+    <!-- Breadcrumb -->
+    <app-term-breadcrumb
+      [items]="breadcrumbItems"
+      [testId]="selectors.BREADCRUMB"
+    ></app-term-breadcrumb>
+
+    <!-- Header -->
+    <div class="term-version-detail__header">
+      <h1 class="term-version-detail__title">{{ detail.name }}</h1>
+      <div class="term-version-detail__header-actions">
+        <ex-button
+          variant="outline"
+          outlineColor="var(--semantic-color-neutral-500, #616161)"
+          size="small"
+          icon="edit"
+          [iconSize]="14"
+          [attr.data-testid]="selectors.BTN_EDIT_STATUS"
+          (click)="onEditStatus()"
+        >
+          {{ messages.BTN_EDIT_STATUS }}
+        </ex-button>
+        <ex-button
+          variant="outline"
+          outlineColor="var(--semantic-color-neutral-500, #616161)"
+          size="small"
+          icon="paper"
+          [iconSize]="14"
+          [attr.data-testid]="selectors.BTN_CREATE_VERSION"
+          (click)="createVersion()"
+        >
+          {{ messages.BTN_CREATE_VERSION }}
+        </ex-button>
+        <ex-button
+          variant="outline"
+          outlineColor="var(--semantic-color-neutral-500, #616161)"
+          size="small"
+          icon="export"
+          [iconSize]="14"
+          [attr.data-testid]="selectors.BTN_EXPORT"
+        >
+          {{ messages.BTN_EXPORT }}
+        </ex-button>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <app-term-info-card [testId]="selectors.INFO_CARD">
+      <app-term-info-item [label]="messages.INFO_VERSION">
+        <span>{{ detail.version }}</span>
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_CREATED_BY">
+        <span>{{ detail.operationBy }}</span>
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_CREATED_AT">
+        <span>{{ detail.createdAt }}</span>
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_TYPE">
+        <ex-tag variant="info" icon="lock"
+          >{{ messages.TYPE_MANDATORY }}</ex-tag
+        >
+      </app-term-info-item>
+      <app-term-info-item [label]="messages.INFO_STATUS">
+        <app-term-status-badge
+          [status]="detail.status"
+          [publishedLabel]="messages.STATUS_PUBLISHED"
+          [inactiveLabel]="messages.STATUS_INACTIVE"
+        ></app-term-status-badge>
+      </app-term-info-item>
+    </app-term-info-card>
+
+    <!-- Detail Section -->
+    <div class="term-version-detail__section-title">
+      {{ messages.SECTION_DETAIL }}
+    </div>
+    <div class="term-version-detail__content-card">
+      <div
+        class="term-version-detail__content"
+        [attr.data-testid]="selectors.CONTENT"
+      >
+        <ex-text-editor-view
+          [html]="detail.content ?? ''"
+        ></ex-text-editor-view>
+      </div>
+      <div class="term-version-detail__checkbox-row">
+        <ex-checkbox
+          [checked]="state.isAccepted()"
+          [attr.data-testid]="selectors.CHECKBOX"
+          (checkedChange)="state.toggleAccepted()"
+        >
+          <span class="term-version-detail__checkbox-text">
+            @if (showCheckboxRequiredStar) {
+            <span class="term-version-detail__checkbox-required">*</span>
+            } {{ checkboxLabel }}
+          </span>
+        </ex-checkbox>
+      </div>
+    </div>
+    } @else if (!state.isLoading()) {
+    <div class="term-version-detail__not-found">{{ messages.NOT_FOUND }}</div>
+    }
+  </ex-spinning>
+</div>
+
+<!-- Edit Status Modal -->
+<app-term-edit-status-modal
+  [modal]="state.editModal()"
+  [title]="messages.MODAL_EDIT_TITLE"
+  [options]="editStatusOptions"
+  [cancelLabel]="messages.MODAL_BTN_CANCEL"
+  [saveLabel]="messages.MODAL_BTN_SAVE"
+  (closed)="state.closeEditModal()"
+  (selectionChange)="onSelectEditStatus($event)"
+  (save)="state.saveEditStatus()"
+></app-term-edit-status-modal>
+
+@if (state.showToast()) {
+<div class="term-version-detail__toast-wrap">
+  <ex-toast
+    [variant]="state.toastVariant()"
+    [autoDismiss]="true"
+    [autoDismissTime]="3000"
+    [showConfirmButton]="false"
+    [showCloseButton]="true"
+    (dismiss)="state.dismissToast()"
+    >{{ state.toastMessage() }}</ex-toast
+  >
+</div>
+}

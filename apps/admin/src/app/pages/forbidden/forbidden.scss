@@ -1,0 +1,65 @@
+@import '@exim/ui-kit/dist/css/design-tokens.css';
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.forbidden-container {
+  display: grid;
+  place-items: center;
+  height: calc(100dvh - 90px);
+  max-height: calc(100dvh - 90px);
+  width: 100%;
+  overflow: hidden;
+}
+
+.forbidden-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.forbidden-image {
+  max-width: 330px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.forbidden-title {
+  font-family: var(--font-families-base);
+  font-weight: var(--font-weights-bold);
+  font-size: var(--size-h2);
+  line-height: var(--space-10);
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--color-primary-default);
+  margin: 0;
+  margin-bottom: 16px;
+}
+
+.forbidden-description {
+  font-family: var(--font-families-base);
+  font-weight: var(--font-weights-regular);
+  font-size: var(--size-body-lg);
+  line-height: var(--space-6);
+  letter-spacing: 0;
+  text-align: center;
+  white-space: pre-line;
+  color: var(--color-neutral-500);
+  margin: 0;
+}
+
+.forbidden-content ex-button {
+  margin-top: 32px;
+}
+
+.forbidden-btn-text {
+  font-family: var(--font-families-base);
+  font-weight: var(--font-weights-bold);
+  font-size: var(--font-sizes-h4);
+  line-height: var(--space-7);
+  letter-spacing: 0;
+  text-align: center;
+}

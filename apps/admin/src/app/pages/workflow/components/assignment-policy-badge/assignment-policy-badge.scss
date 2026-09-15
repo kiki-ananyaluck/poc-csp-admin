@@ -1,0 +1,19 @@
+.policy-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.policy-badge--all {
+  border: 1px solid #034ea1;
+  color: #034ea1;
+  background: transparent;
+}
+
+.policy-badge--any {
+  background: #034ea1;
+  color: #ffffff;
+}

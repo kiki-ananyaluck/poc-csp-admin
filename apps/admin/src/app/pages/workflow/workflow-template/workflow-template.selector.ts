@@ -1,0 +1,15 @@
+export const WORKFLOW_TEMPLATE_SELECTORS = {
+  CONTAINER: 'workflow-template-container',
+  TITLE: 'workflow-template-title',
+  FORM_CODE: 'workflow-template-form-code',
+  FORM_NAME: 'workflow-template-form-name',
+  FORM_DESC: 'workflow-template-form-desc',
+  FORM_BUSINESS_TYPES: 'workflow-template-form-business-types',
+  BUILDER: 'workflow-template-builder',
+  BUILDER_NODE: 'workflow-template-builder-node',
+  ACTION_PICKER: 'workflow-template-action-picker',
+  STEP_EDITOR: 'workflow-template-step-editor',
+  BUTTON_SUBMIT: 'workflow-template-button-submit',
+  TOAST_SUCCESS: 'workflow-template-toast-success',
+  TOAST_ERROR: 'workflow-template-toast-error',
+};

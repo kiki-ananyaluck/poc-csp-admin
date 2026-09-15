@@ -1,0 +1,219 @@
+<div class="workflow-start" [attr.data-testid]="selectors.CONTAINER">
+  <div class="workflow-start__header">
+    <h2 class="workflow-start__title" [attr.data-testid]="selectors.TITLE">{{ messages.PAGE_TITLE }}</h2>
+  </div>
+
+  <!-- Wizard Steps Indicator -->
+  <div class="workflow-start__wizard-steps" [attr.data-testid]="selectors.WIZARD_STEPS">
+    <div class="workflow-start__wizard-step" [attr.data-testid]="selectors.WIZARD_STEP_1" [class.workflow-start__wizard-step--active]="state.currentStep() >= 1" [class.workflow-start__wizard-step--done]="state.currentStep() > 1">
+      <span class="workflow-start__wizard-circle">1</span>
+      <span class="workflow-start__wizard-label">{{ messages.STEP1_LABEL }}</span>
+    </div>
+    <div class="workflow-start__wizard-connector" [class.workflow-start__wizard-connector--active]="state.currentStep() > 1"></div>
+    <div class="workflow-start__wizard-step" [attr.data-testid]="selectors.WIZARD_STEP_2" [class.workflow-start__wizard-step--active]="state.currentStep() >= 2" [class.workflow-start__wizard-step--done]="state.currentStep() > 2">
+      <span class="workflow-start__wizard-circle">2</span>
+      <span class="workflow-start__wizard-label">{{ messages.STEP2_LABEL }}</span>
+    </div>
+    <div class="workflow-start__wizard-connector" [class.workflow-start__wizard-connector--active]="state.currentStep() > 2"></div>
+    <div class="workflow-start__wizard-step" [attr.data-testid]="selectors.WIZARD_STEP_3" [class.workflow-start__wizard-step--active]="state.currentStep() >= 3">
+      <span class="workflow-start__wizard-circle">3</span>
+      <span class="workflow-start__wizard-label">{{ messages.STEP3_LABEL }}</span>
+    </div>
+  </div>
+
+  <!-- Step 1: ตรวจสอบ Document -->
+  @if (state.currentStep() === 1) {
+    <div class="workflow-start__card" [attr.data-testid]="selectors.STEP1_CARD">
+      <h3 class="workflow-start__card-title">{{ messages.STEP1_CARD_TITLE }}</h3>
+      <div class="workflow-start__check-form">
+        <div class="workflow-start__field">
+          <label for="workflow-start-document-id">{{ messages.STEP1_INPUT_LABEL }}</label>
+          <input
+            id="workflow-start-document-id"
+            type="text"
+            [attr.data-testid]="selectors.STEP1_INPUT"
+            [ngModel]="state.documentId()"
+            (ngModelChange)="state.documentId.set($event)"
+            [placeholder]="messages.STEP1_INPUT_PLACEHOLDER"
+            [disabled]="state.checkingDocument()"
+          />
+        </div>
+        <ex-button [attr.data-testid]="selectors.STEP1_BUTTON_CHECK" variant="primary" [disabled]="!state.documentId().trim() || state.checkingDocument()" (click)="checkDocument()">
+          {{ state.checkingDocument() ? messages.STEP1_BUTTON_CHECKING : messages.STEP1_BUTTON_CHECK }}
+        </ex-button>
+      </div>
+
+      @if (state.checkResult() && !state.canProceedToStep2()) {
+        <div class="workflow-start__warning" [attr.data-testid]="selectors.STEP1_WARNING">
+          <span>{{ messages.STEP1_WARNING }}</span>
+          <button class="workflow-start__link" type="button" [attr.data-testid]="selectors.STEP1_LINK_VIEW" (click)="navigateToExisting()">
+            {{ messages.STEP1_LINK_VIEW }}
+          </button>
+        </div>
+      }
+
+      @if (state.checkError()) {
+        <div class="workflow-start__error" [attr.data-testid]="selectors.STEP1_ERROR">{{ state.checkError() }}</div>
+      }
+    </div>
+  }
+
+  <!-- Step 2: เลือก Template -->
+  @if (state.currentStep() === 2) {
+    <div class="workflow-start__card" [attr.data-testid]="selectors.STEP2_CARD">
+      <h3 class="workflow-start__card-title">{{ messages.STEP2_CARD_TITLE }}</h3>
+
+      <div class="workflow-start__field">
+        <label for="workflow-start-template-code">{{ messages.STEP2_SELECT_LABEL }}</label>
+        <select
+          id="workflow-start-template-code"
+          [attr.data-testid]="selectors.STEP2_SELECT"
+          [ngModel]="state.selectedTemplateCode()"
+          (ngModelChange)="onTemplateSelect($event)"
+        >
+          <option value="">{{ messages.STEP2_SELECT_PLACEHOLDER }}</option>
+          @for (t of state.templateOptions(); track t.code) {
+            <option [value]="t.code">{{ t.name }} ({{ t.code }})</option>
+          }
+        </select>
+      </div>
+
+      @if (state.loadingTemplate()) {
+        <p class="workflow-start__loading-text" [attr.data-testid]="selectors.STEP2_LOADING">{{ messages.STEP2_LOADING }}</p>
+      }
+
+      @if (state.selectedTemplate()) {
+        <div class="workflow-start__template-preview" [attr.data-testid]="selectors.STEP2_TEMPLATE_PREVIEW">
+          <h4>{{ messages.STEP2_STEPS_TITLE }}</h4>
+          <div class="workflow-start__steps-list">
+            @for (step of templateStepsFlat; track step.stepTemplateId) {
+              <div class="workflow-start__step-item">
+                <div class="workflow-start__step-item-header">
+                  <span class="workflow-start__step-order">{{ step.stepTemplateId }}</span>
+                  <span class="workflow-start__step-name">{{ step.stepName }}</span>
+                  <app-assignment-policy-badge [policy]="step.assignmentPolicy"></app-assignment-policy-badge>
+                </div>
+
+                <!-- Assignees section for this step -->
+                <div class="workflow-start__assignees-section">
+                  @for (assignee of state.stepAssigneesMap()[step.stepTemplateId]; track $index; let idx = $index) {
+                    <div class="workflow-start__assignee-edit-row">
+                      <div class="workflow-start__assignee-field">
+                        <label [attr.for]="'workflow-start-user-id-' + step.stepTemplateId + '-' + idx">
+                          {{ messages.STEP2_USER_ID_LABEL }}
+                          @if (!isValidUserId(state.stepAssigneesMap()[step.stepTemplateId][idx].userId)) {
+                            <span class="workflow-start__field-error">{{ messages.STEP2_USER_ID_INVALID }}</span>
+                          }
+                        </label>
+                        <input
+                          [id]="'workflow-start-user-id-' + step.stepTemplateId + '-' + idx"
+                          type="text"
+                          [(ngModel)]="state.stepAssigneesMap()[step.stepTemplateId][idx].userId"
+                          [placeholder]="messages.STEP2_USER_ID_LABEL"
+                          [class.workflow-start__input--error]="!isValidUserId(state.stepAssigneesMap()[step.stepTemplateId][idx].userId)"
+                        />
+                      </div>
+                      <div class="workflow-start__assignee-field">
+                        <span class="workflow-start__assignee-label">{{ messages.STEP2_ROLE_LABEL }}</span>
+                        <ex-dropdown
+                          [options]="roleOptions"
+                          [(ngModel)]="state.stepAssigneesMap()[step.stepTemplateId][idx].role"
+                        ></ex-dropdown>
+                      </div>
+                      <button
+                        class="workflow-start__assignee-remove"
+                        (click)="removeAssignee(step.stepTemplateId, idx)"
+                        [disabled]="(state.stepAssigneesMap()[step.stepTemplateId]?.length ?? 0) <= 1"
+                        [title]="messages.STEP2_REMOVE_ASSIGNEE_TITLE"
+                      >✕</button>
+                    </div>
+                  }
+                  <button class="workflow-start__assignee-add" (click)="addAssignee(step.stepTemplateId)">
+                    {{ messages.STEP2_ADD_ASSIGNEE_PREFIX }} {{ step.stepTemplateId }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="workflow-start__nav">
+        <ex-button [attr.data-testid]="selectors.STEP2_BUTTON_BACK" variant="neutral" (click)="goToStep(1)">{{ messages.BUTTON_BACK }}</ex-button>
+        <ex-button [attr.data-testid]="selectors.STEP2_BUTTON_NEXT" variant="primary" [disabled]="!state.selectedTemplate() || hasInvalidUserIds()" (click)="goToStep(3)">{{ messages.BUTTON_NEXT }}</ex-button>
+      </div>
+    </div>
+  }
+
+  <!-- Step 3: ยืนยัน -->
+  @if (state.currentStep() === 3) {
+    <div class="workflow-start__card" [attr.data-testid]="selectors.STEP3_CARD">
+      <h3 class="workflow-start__card-title">{{ messages.STEP3_CARD_TITLE }}</h3>
+
+      <div class="workflow-start__summary" [attr.data-testid]="selectors.STEP3_SUMMARY">
+        <div class="workflow-start__summary-row">
+          <span class="workflow-start__summary-label">{{ messages.STEP3_DOC_ID_LABEL }}</span>
+          <span>{{ state.documentId() }}</span>
+        </div>
+        <div class="workflow-start__summary-row">
+          <span class="workflow-start__summary-label">{{ messages.STEP3_BUSINESS_TYPE_LABEL }}</span>
+          <span>{{ state.selectedTemplate()?.businessType }}</span>
+        </div>
+        <div class="workflow-start__summary-row">
+          <span class="workflow-start__summary-label">{{ messages.STEP3_TEMPLATE_LABEL }}</span>
+          <span>{{ state.selectedTemplate()?.templateName }} ({{ state.selectedTemplate()?.templateCode }})</span>
+        </div>
+        <div class="workflow-start__summary-steps">
+          <h4>{{ messages.STEP3_STEPS_TITLE }}</h4>
+          @for (step of templateStepsFlat; track step.stepTemplateId) {
+            <div class="workflow-start__summary-step">
+              <div class="workflow-start__summary-step-header">
+                <span class="workflow-start__summary-step-order">{{ step.stepTemplateId }}.</span>
+                <span class="workflow-start__summary-step-name">{{ step.stepName }}  </span>
+                <app-assignment-policy-badge [policy]="step.assignmentPolicy"></app-assignment-policy-badge>
+              </div>
+              @if ((state.stepAssigneesMap()[step.stepTemplateId]?.length ?? 0) > 0) {
+                <ul class="workflow-start__summary-assignees">
+                  @for (assignee of state.stepAssigneesMap()[step.stepTemplateId]; track $index) {
+                    @if (assignee.userId || assignee.role) {
+                      <li class="workflow-start__summary-assignee">
+                        <span class="workflow-start__summary-assignee-id">{{ messages.STEP3_USER_ID_PREFIX }} {{ assignee.userId }}</span>
+                        @if (assignee.role) {
+                          <span class="workflow-start__summary-assignee-role">{{ messages.STEP3_ROLE_PREFIX }} {{ assignee.role }}</span>
+                        }
+                      </li>
+                    }
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (state.submitError()) {
+        <div class="workflow-start__error" [attr.data-testid]="selectors.STEP3_ERROR">{{ state.submitError() }}</div>
+      }
+
+      <div class="workflow-start__nav">
+        <ex-button [attr.data-testid]="selectors.STEP3_BUTTON_BACK" variant="neutral" (click)="goToStep(2)">{{ messages.BUTTON_BACK }}</ex-button>
+        <ex-button [attr.data-testid]="selectors.STEP3_BUTTON_SUBMIT" variant="primary" [disabled]="state.submitting()" (click)="submitWorkflow()">
+          {{ state.submitting() ? messages.BUTTON_SUBMITTING : messages.BUTTON_SUBMIT }}
+        </ex-button>
+      </div>
+    </div>
+  }
+</div>
+
+@if (state.showSuccessToast()) {
+  <div class="workflow-start__toast-wrap">
+    <ex-toast
+      [attr.data-testid]="selectors.TOAST_SUCCESS"
+      variant="success"
+      [autoDismiss]="true"
+      [autoDismissTime]="3000"
+      [showCloseButton]="true"
+      (dismiss)="state.showSuccessToast.set(false)"
+    >{{ messages.TOAST_SUCCESS }}</ex-toast>
+  </div>
+}

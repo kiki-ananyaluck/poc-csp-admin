@@ -1,0 +1,19 @@
+<div class="forbidden-container">
+  <div class="forbidden-content">
+    <img
+      class="forbidden-image"
+      src="/images/Page-Forbidden.png"
+      [alt]="messages.IMG_ALT"
+    />
+    <h2 class="forbidden-title">{{ messages.TITLE }}</h2>
+    <p class="forbidden-description">{{ messages.DESCRIPTION }}</p>
+    <ex-button
+      variant="primary"
+      size="default"
+      width="290px"
+      (click)="goBack()"
+    >
+      <span class="forbidden-btn-text">{{ messages.CONTINUE_BTN }}</span>
+    </ex-button>
+  </div>
+</div>
