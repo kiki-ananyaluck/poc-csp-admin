@@ -54,7 +54,6 @@ Thumbs.db
 .nx/workspace-data
 
 .angular
-.npmrc
 
 #for ai agents
 .agents

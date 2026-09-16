@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pnpm exec nx build admin --configuration=production",
+  "outputDirectory": "dist/apps/admin/browser",
+  "installCommand": "pnpm install --frozen-lockfile"
+}
